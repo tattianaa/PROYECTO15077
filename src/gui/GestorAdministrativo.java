@@ -14,6 +14,7 @@ public class GestorAdministrativo extends JFrame {
 	private JPanel panelPrendas;
 	private JPanel panelPedidos;
 	private javax.swing.table.DefaultTableModel modeloTabla;
+	
 	//podrán usar a la "lógica" para borrar o editar.
 	private InventarioLogica logica = new InventarioLogica();
 
@@ -492,10 +493,13 @@ public class GestorAdministrativo extends JFrame {
 
 						btnCancel.addActionListener(ev -> dlg.dispose());
 						btnGuardar.addActionListener(ev -> {
-							modeloTabla.setValueAt(tNombre.getText().trim(), row, 2);
-							modeloTabla.setValueAt(tStock.getText().trim(), row, 3);
-							modeloTabla.setValueAt("S/. " + tPrecio.getText().trim(), row, 4);
-							modeloTabla.setValueAt(combo.getSelectedItem(), row, 5);
+							String nombre = tNombre.getText().trim();
+							String precio = tPrecio.getText().trim();
+							String stock = tStock.getText().trim();
+							String categoria = combo.getSelectedItem().toString();
+							String codigo = tId.getText().trim();
+
+							logica.editarPrenda(row, modeloTabla, codigo, nombre, stock, precio, categoria);
 							// Sincronizar con la tarjeta del grid
 							if (row < gridPanel.getComponentCount()) {
 								JPanel card = (JPanel) gridPanel.getComponent(row);
@@ -564,6 +568,7 @@ public class GestorAdministrativo extends JFrame {
 		JTextField txtNombre = new JTextField();
 		txtNombre.setBounds(20, 42, 350, 30);
 		panel.add(txtNombre);
+		
 
 		JLabel lCodigo = new JLabel("Código:");
 		lCodigo.setBounds(20, 80, 100, 20);
@@ -571,6 +576,19 @@ public class GestorAdministrativo extends JFrame {
 		JTextField txtCodigo = new JTextField();
 		txtCodigo.setBounds(20, 102, 350, 30);
 		panel.add(txtCodigo);
+		
+		//mientras escribe se convierta a mayusculas
+		txtNombre.addKeyListener(new KeyAdapter() {
+		    public void keyReleased(KeyEvent e) {
+		        txtNombre.setText(txtNombre.getText().toUpperCase());
+		    }
+		});
+
+		txtCodigo.addKeyListener(new KeyAdapter() {
+		    public void keyReleased(KeyEvent e) {
+		        txtCodigo.setText(txtCodigo.getText().toUpperCase());
+		    }
+		});
 
 		JLabel lPrecio = new JLabel("Precio:");
 		lPrecio.setBounds(20, 140, 100, 20);
@@ -638,14 +656,17 @@ public class GestorAdministrativo extends JFrame {
 		btnCancelar.addActionListener(e -> dialog.dispose());
 
 		btnGuardar.addActionListener(e -> {
-			String nombre = txtNombre.getText().trim();
+			String nombre = txtNombre.getText().trim().toUpperCase();
+			String codigo = txtCodigo.getText().trim().toUpperCase();
 			String precio = txtPrecio.getText().trim();
-			String codigo = txtCodigo.getText().trim();
 			String stock = txtStock.getText().trim();
 			String categoria = (String) comboCat.getSelectedItem();
-			if (nombre.isEmpty() || precio.isEmpty()) {
-				JOptionPane.showMessageDialog(dialog, "Nombre y precio son obligatorios.");
-				return;
+			// VALIDAR 
+			String resultado = logica.validarTodo(nombre, codigo, precio, stock, modeloTabla);
+
+			if (!resultado.equals("OK")) {
+			    JOptionPane.showMessageDialog(dialog, resultado);
+			    return;
 			}
 			// Imagen para la tabla
 			ImageIcon iconTabla = null;
