@@ -136,7 +136,7 @@ public class GestorProveedores extends JPanel {
 
             // Validar que ningún campo esté vacío
             if (codigo.isEmpty() || nombre.isEmpty() || ruc.isEmpty() || telefono.isEmpty()) {
-                JOptionPane.showMessageDialog(dlg, "Todos los campos son obligatorios.");
+                JOptionPane.showMessageDialog(dlg, "Todos los campos son obligatorios. Vuelva a intentarlo");
                 return;
             }
 

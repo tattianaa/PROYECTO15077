@@ -71,9 +71,10 @@ public class GestorAdministrativo extends JFrame {
         agregarBotonSidebar(sidebar, "🏠  Inicio",               65);
         agregarBotonSidebar(sidebar, "📦  GESTIÓN DE PEDIDOS",   100);
         agregarBotonSidebar(sidebar, "🏭  Proveedores",          135);
-        agregarBotonSidebar(sidebar, "⚙️  Configuración",        170);
-        agregarBotonSidebar(sidebar, "🚪  Cerrar Sesión",        205);
-        agregarBotonSidebar(sidebar, "📋  Panel de Gestión",     240);
+        agregarBotonSidebar(sidebar, "📥  Entradas",             170);
+        agregarBotonSidebar(sidebar, "⚙️  Configuración",        205);
+        agregarBotonSidebar(sidebar, "🚪  Cerrar Sesión",        240);
+        agregarBotonSidebar(sidebar, "📋  Panel de Gestión",     275);
 
         return sidebar;
     }
@@ -99,10 +100,11 @@ public class GestorAdministrativo extends JFrame {
         mainPanel.setBounds(202, 0, 798, 650);
         contentPane.add(mainPanel);
 
-        mainPanel.add(construirPanelPrendas(), "prendas");
-        mainPanel.add(construirPanelPedidos(), "pedidos");
-        mainPanel.add(construirPanelGestion(),  "gestion");
-        mainPanel.add(new GestorProveedores(),  "proveedores"); // panel de proveedores
+        mainPanel.add(construirPanelPrendas(),   "prendas");
+        mainPanel.add(construirPanelPedidos(),   "pedidos");
+        mainPanel.add(construirPanelGestion(),   "gestion");
+        mainPanel.add(new GestorProveedores(),   "proveedores");
+        mainPanel.add(construirPanelEntradas(),  "entradas");
 
         // Navegación entre paneles usando CardLayout
         CardLayout cl = (CardLayout) mainPanel.getLayout();
@@ -118,6 +120,7 @@ public class GestorAdministrativo extends JFrame {
                 if (txt.contains("PEDIDOS"))      b.addActionListener(e -> cl.show(mainPanel, "pedidos"));
                 if (txt.contains("Gestión"))      b.addActionListener(e -> cl.show(mainPanel, "gestion"));
                 if (txt.contains("Proveedores"))  b.addActionListener(e -> cl.show(mainPanel, "proveedores"));
+                if (txt.contains("Entradas"))     b.addActionListener(e -> cl.show(mainPanel, "entradas"));
                 if (txt.contains("Cerrar"))       b.addActionListener(e -> { new Login().setVisible(true); dispose(); });
             }
         }
@@ -336,9 +339,9 @@ public class GestorAdministrativo extends JFrame {
                     int ok = JOptionPane.showConfirmDialog(null,
                         "¿Eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
                     if (ok == JOptionPane.YES_OPTION) {
-                        gestor.eliminarPrenda(row);  // lógica elimina de la lista
-                        iconosPorFila.remove(row);   // limpiar iconos guardados
-                        refrescarVista();            // GUI reconstruye tabla y grid
+                        gestor.eliminarPrenda(row);
+                        iconosPorFila.remove(row);
+                        refrescarVista();
                         JOptionPane.showMessageDialog(null, "Se eliminó de la tabla y del catálogo.");
                     }
                 }
@@ -733,9 +736,9 @@ public class GestorAdministrativo extends JFrame {
                 "¿Deseas eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 int idx = gridPanel.getComponentZOrder(card);
-                gestor.eliminarPrenda(idx);   // lógica elimina de la lista
-                iconosPorFila.remove(idx);    // limpiar iconos guardados
-                refrescarVista();             // GUI reconstruye tabla y grid
+                gestor.eliminarPrenda(idx);
+                iconosPorFila.remove(idx);
+                refrescarVista();
                 JOptionPane.showMessageDialog(null, "Se eliminó de la tabla y del catálogo.");
             }
         });
@@ -1006,5 +1009,181 @@ public class GestorAdministrativo extends JFrame {
         btn.setOpaque(true);
         btn.setBounds(x, y, 160, 36);
         return btn;
+    }
+
+    // ─────────────────────────────────────────
+    // PANEL ENTRADAS DE MERCADERÍA
+    // ─────────────────────────────────────────
+
+    private JPanel construirPanelEntradas() {
+        JPanel panel = new JPanel(null);
+        panel.setBackground(new Color(245, 242, 225));
+
+        // ── Título ──
+        JLabel lblTitulo = new JLabel("Registro de Entradas de Mercadería");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        lblTitulo.setBounds(20, 15, 400, 28);
+        panel.add(lblTitulo);
+
+        // ── Formulario de registro ──
+        JPanel formPanel = new JPanel(null);
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(new LineBorder(new Color(220, 220, 220), 1, true));
+        formPanel.setBounds(20, 55, 758, 180);
+        panel.add(formPanel);
+
+        // Proveedor
+        JLabel lProv = new JLabel("Proveedor (código):");
+        lProv.setFont(new Font("Arial", Font.PLAIN, 12));
+        lProv.setBounds(15, 15, 150, 20);
+        formPanel.add(lProv);
+        JTextField txtProveedor = new JTextField();
+        txtProveedor.setBounds(15, 35, 150, 30);
+        formPanel.add(txtProveedor);
+
+        // Prenda
+        JLabel lPrenda = new JLabel("Prenda (código):");
+        lPrenda.setFont(new Font("Arial", Font.PLAIN, 12));
+        lPrenda.setBounds(180, 15, 130, 20);
+        formPanel.add(lPrenda);
+        JTextField txtPrenda = new JTextField();
+        txtPrenda.setBounds(180, 35, 130, 30);
+        formPanel.add(txtPrenda);
+
+        // Talla
+        JLabel lTalla = new JLabel("Talla:");
+        lTalla.setFont(new Font("Arial", Font.PLAIN, 12));
+        lTalla.setBounds(325, 15, 60, 20);
+        formPanel.add(lTalla);
+        String[] tallas = {"XS", "S", "M", "L", "XL", "26", "28", "30", "32", "34", "ÚNICA"};
+        JComboBox<String> comboTalla = new JComboBox<>(tallas);
+        comboTalla.setBounds(325, 35, 80, 30);
+        formPanel.add(comboTalla);
+
+        // Color
+        JLabel lColor = new JLabel("Color:");
+        lColor.setFont(new Font("Arial", Font.PLAIN, 12));
+        lColor.setBounds(420, 15, 60, 20);
+        formPanel.add(lColor);
+        JTextField txtColor = new JTextField();
+        txtColor.setBounds(420, 35, 100, 30);
+        formPanel.add(txtColor);
+
+        // Cantidad
+        JLabel lCantidad = new JLabel("Cantidad:");
+        lCantidad.setFont(new Font("Arial", Font.PLAIN, 12));
+        lCantidad.setBounds(535, 15, 80, 20);
+        formPanel.add(lCantidad);
+        JTextField txtCantidad = new JTextField();
+        txtCantidad.setBounds(535, 35, 80, 30);
+        formPanel.add(txtCantidad);
+
+        // Fecha
+        JLabel lFecha = new JLabel("Fecha (dd/MM/yyyy):");
+        lFecha.setFont(new Font("Arial", Font.PLAIN, 12));
+        lFecha.setBounds(630, 15, 160, 20);
+        formPanel.add(lFecha);
+        JTextField txtFecha = new JTextField();
+        txtFecha.setBounds(630, 35, 110, 30);
+        formPanel.add(txtFecha);
+
+        // Botón registrar
+        JButton btnRegistrar = new JButton("REGISTRAR ENTRADA");
+        btnRegistrar.setFont(new Font("Arial", Font.BOLD, 12));
+        btnRegistrar.setBackground(new Color(130, 190, 140));
+        btnRegistrar.setForeground(Color.WHITE);
+        btnRegistrar.setBorderPainted(false);
+        btnRegistrar.setFocusPainted(false);
+        btnRegistrar.setOpaque(true);
+        btnRegistrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegistrar.setBounds(15, 100, 200, 36);
+        formPanel.add(btnRegistrar);
+
+        // Botón limpiar
+        JButton btnLimpiar = new JButton("LIMPIAR");
+        btnLimpiar.setFont(new Font("Arial", Font.BOLD, 12));
+        btnLimpiar.setBackground(new Color(180, 180, 185));
+        btnLimpiar.setForeground(Color.WHITE);
+        btnLimpiar.setBorderPainted(false);
+        btnLimpiar.setFocusPainted(false);
+        btnLimpiar.setOpaque(true);
+        btnLimpiar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLimpiar.setBounds(230, 100, 120, 36);
+        formPanel.add(btnLimpiar);
+
+        // ── Tabla de entradas registradas ──
+        JLabel lblHistorial = new JLabel("Historial de Entradas");
+        lblHistorial.setFont(new Font("Arial", Font.BOLD, 13));
+        lblHistorial.setBounds(20, 248, 250, 22);
+        panel.add(lblHistorial);
+
+        String[] columnas = {"Proveedor", "Prenda", "Talla", "Color", "Cantidad", "Fecha"};
+        DefaultTableModel modeloEntradas = new DefaultTableModel(columnas, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        JTable tablaEntradas = new JTable(modeloEntradas);
+        tablaEntradas.setRowHeight(28);
+        tablaEntradas.setFont(new Font("Arial", Font.PLAIN, 12));
+        tablaEntradas.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        tablaEntradas.getTableHeader().setBackground(new Color(240, 235, 225));
+        tablaEntradas.setBackground(Color.WHITE);
+        tablaEntradas.setGridColor(new Color(220, 220, 220));
+        tablaEntradas.setSelectionBackground(new Color(220, 190, 195));
+
+        JScrollPane scrollEntradas = new JScrollPane(tablaEntradas);
+        scrollEntradas.setBounds(20, 275, 758, 340);
+        scrollEntradas.setBorder(new LineBorder(new Color(220, 220, 220)));
+        panel.add(scrollEntradas);
+
+        // ── Acciones de los botones ──
+        btnLimpiar.addActionListener(e -> {
+            txtProveedor.setText("");
+            txtPrenda.setText("");
+            txtColor.setText("");
+            txtCantidad.setText("");
+            txtFecha.setText("");
+            comboTalla.setSelectedIndex(0);
+        });
+
+        btnRegistrar.addActionListener(e -> {
+            String proveedor = txtProveedor.getText().trim().toUpperCase();
+            String prenda    = txtPrenda.getText().trim().toUpperCase();
+            String talla     = (String) comboTalla.getSelectedItem();
+            String color     = txtColor.getText().trim();
+            String cantidad  = txtCantidad.getText().trim();
+            String fecha     = txtFecha.getText().trim();
+
+            // Validación básica: ningún campo vacío
+            if (proveedor.isEmpty() || prenda.isEmpty() || color.isEmpty()
+                    || cantidad.isEmpty() || fecha.isEmpty()) {
+                JOptionPane.showMessageDialog(panel, "Todos los campos son obligatorios.");
+                return;
+            }
+            // Validar que cantidad sea número entero positivo
+            int cant;
+            try {
+                cant = Integer.parseInt(cantidad);
+                if (cant <= 0) throw new NumberFormatException();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(panel, "La cantidad debe ser un número entero mayor a 0.");
+                return;
+            }
+            // Validar formato de fecha dd/MM/yyyy
+            if (!fecha.matches("\\d{2}/\\d{2}/\\d{4}")) {
+                JOptionPane.showMessageDialog(panel, "La fecha debe tener el formato dd/MM/yyyy.");
+                return;
+            }
+
+            // TODO: conectar con EntradaLogica.registrarEntrada() cuando esté listo
+            // Por ahora solo agrega a la tabla visual
+            modeloEntradas.addRow(new Object[]{proveedor, prenda, talla, color, cant, fecha});
+            JOptionPane.showMessageDialog(panel, "Entrada registrada correctamente.");
+
+            // Limpiar campos después de registrar
+            btnLimpiar.doClick();
+        });
+
+        return panel;
     }
 }
