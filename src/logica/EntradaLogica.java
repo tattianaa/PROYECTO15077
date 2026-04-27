@@ -12,6 +12,7 @@ public class EntradaLogica {
         this.entradas = new ArrayList<>();
     }
 
+    // Registra una entrada nueva
     public void registrarEntrada(String codigoProveedor, String codigoPrenda, String talla,
                                  String color, int cantidad, String fecha) {
         EntradaInventario entrada = new EntradaInventario(
@@ -24,7 +25,8 @@ public class EntradaLogica {
         return new ArrayList<>(entradas);
     }
 
-    public List<EntradaInventario> getEntradasPorPrenda(String codigoPrenda) {
+    // Filtra entradas por código de prenda
+    public List<EntradaInventario> registrarEntrada(String codigoPrenda) {
         List<EntradaInventario> filtradas = new ArrayList<>();
         for (EntradaInventario entrada : entradas) {
             if (entrada.getCodigoPrenda().equalsIgnoreCase(codigoPrenda)) {
