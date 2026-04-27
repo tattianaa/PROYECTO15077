@@ -5,7 +5,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
+import java.net.URL;
+import java.net.URI;
 public class PanelInicio extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -79,8 +80,22 @@ public class PanelInicio extends JFrame {
 		
 		
 		lblLogo = new JLabel();
-		lblLogo.setIcon(new ImageIcon("C:\\Users\\HP\\Desktop\\35oremoe.png"));
 		lblLogo.setBounds(171, 92, 348, 66);
-		contentPane.add(lblLogo);
-	}
+        // 2. LO AÑADIMOS al panel antes de cargar la imagen
+        contentPane.add(lblLogo);
+
+        try {
+            URL url = new URI("https://www.myinstants.com/media/instants_images/meeeeee-mayimbu.jpg").toURL();
+            ImageIcon iconoOriginal = new ImageIcon(url);
+            
+            // 3. USAMOS LOS VALORES DIRECTOS (348, 66) para que no falle si el componente no ha cargado
+            Image img = iconoOriginal.getImage();
+            Image imgEscalada = img.getScaledInstance(348, 66, Image.SCALE_SMOOTH);
+            
+            lblLogo.setIcon(new ImageIcon(imgEscalada));
+        } catch (Exception e) {
+            System.err.println("Error al cargar la imagen del logo");
+            e.printStackTrace();
+        }    
+	}	
 }

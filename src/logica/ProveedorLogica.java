@@ -65,4 +65,13 @@ public class ProveedorLogica {
 
         return "OK";
     }
+
+    // Devuelve lista de proveedores en formato "CODIGO - Nombre" para mostrar en combo
+    public List<String> getProveedoresFormato() {
+        List<String> lista = new ArrayList<>();
+        for (Proveedor p : proveedores) {
+            lista.add(p.getCodigo() + " - " + p.getNombre());
+        }
+        return lista;
+    }
 }

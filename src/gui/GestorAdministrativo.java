@@ -16,17 +16,19 @@ public class GestorAdministrativo extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private JPanel contentPane;
-    private JPanel gridPanel;
+    // gridPanel eliminado — ya no se usa el catálogo de tarjetas
     private DefaultTableModel modeloTabla;
 
-    // Instancia
+    // Instancia de la lógica de inventario
     private InventarioLogica gestor = new InventarioLogica();
 
-    // Guarda los iconos de imagen por índice para poder refrescar la vista
+    // Instancia de la lógica de proveedores — compartida entre GestorProveedores y GestorEntradas
+    private logica.ProveedorLogica gestorProveedores = new logica.ProveedorLogica();
+
+    // Guarda los iconos de imagen por índice para mostrarlos en la tabla y detalles
     private java.util.Map<Integer, ImageIcon[]> iconosPorFila = new java.util.HashMap<>();
 
     // Botones del sidebar — declarados como campos para conectarlos al CardLayout
-    private JButton btnInicio;
     private JButton btnPedidos;
     private JButton btnProveedores;
     private JButton btnInventarios;
@@ -43,7 +45,7 @@ public class GestorAdministrativo extends JFrame {
     public GestorAdministrativo() {
         setTitle("Proyecto Final - Speakers Moda");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 650);
+        setSize(1100, 650);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -78,16 +80,16 @@ public class GestorAdministrativo extends JFrame {
         // Botones de navegación del sidebar — declarados individualmente
         // para que el diseñador visual de Eclipse los reconozca
 
-        JButton btnInicio = new JButton("🏠  INICIO");
-        btnInicio.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnInicio.setForeground(new Color(60, 60, 60));
-        btnInicio.setBackground(Color.WHITE);
-        btnInicio.setBorderPainted(false);
-        btnInicio.setFocusPainted(false);
-        btnInicio.setOpaque(true);
-        btnInicio.setHorizontalAlignment(SwingConstants.LEFT);
-        btnInicio.setBounds(5, 65, 228, 30);
-        sidebar.add(btnInicio);
+        JButton btnGestion = new JButton("📋  PANEL DE GESTIÓN");
+        btnGestion.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnGestion.setForeground(new Color(60, 60, 60));
+        btnGestion.setBackground(Color.WHITE);
+        btnGestion.setBorderPainted(false);
+        btnGestion.setFocusPainted(false);
+        btnGestion.setOpaque(true);
+        btnGestion.setHorizontalAlignment(SwingConstants.LEFT);
+        btnGestion.setBounds(5, 65, 228, 30);
+        sidebar.add(btnGestion);
 
         JButton btnPedidos = new JButton("📦  GESTIÓN DE PEDIDOS");
         btnPedidos.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -144,19 +146,8 @@ public class GestorAdministrativo extends JFrame {
         btnCerrar.setBounds(5, 240, 228, 30);
         sidebar.add(btnCerrar);
 
-        JButton btnGestion = new JButton("📋  PANEL DE GESTIÓN");
-        btnGestion.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnGestion.setForeground(new Color(60, 60, 60));
-        btnGestion.setBackground(Color.WHITE);
-        btnGestion.setBorderPainted(false);
-        btnGestion.setFocusPainted(false);
-        btnGestion.setOpaque(true);
-        btnGestion.setHorizontalAlignment(SwingConstants.LEFT);
-        btnGestion.setBounds(5, 275, 228, 30);
-        sidebar.add(btnGestion);
-
         // Guardar referencia a los botones para conectarlos en construirPanelPrincipal
-        this.btnInicio      = btnInicio;
+      
         this.btnPedidos     = btnPedidos;
         this.btnProveedores = btnProveedores;
         this.btnInventarios = btnInventarios;
@@ -166,24 +157,24 @@ public class GestorAdministrativo extends JFrame {
         return sidebar;
     }
 
-    //Construye el panel principal con CardLayout (prendas, pedidos, gestión)
+    //Construye el panel principal con CardLayout (pedidos, gestión, proveedores, entradas)
     private void construirPanelPrincipal() {
         JPanel mainPanel = new JPanel(new CardLayout());
-        mainPanel.setBounds(242, 0, 758, 650);
+        mainPanel.setBounds(242, 0, 858, 650);
         contentPane.add(mainPanel);
 
-        mainPanel.add(construirPanelPrendas(),   "prendas");
-        mainPanel.add(new GestorPedidos(),       "pedidos");
+        // Panel de gestión es el principal — ya no existe el catálogo de tarjetas
         mainPanel.add(construirPanelGestion(),   "gestion");
-        mainPanel.add(new GestorProveedores(),   "proveedores");
-        mainPanel.add(new GestorEntradas(),      "entradas");
+        mainPanel.add(new GestorPedidos(),       "pedidos");
+        mainPanel.add(new GestorProveedores(gestorProveedores),   "proveedores");
+        mainPanel.add(new GestorEntradas(gestor, gestorProveedores), "entradas");
 
         // Navegación entre paneles usando CardLayout
         CardLayout cl = (CardLayout) mainPanel.getLayout();
-        cl.show(mainPanel, "prendas");
+        // Mostrar panel de gestión al abrir
+        cl.show(mainPanel, "gestion");
 
         // Conectar cada botón del sidebar directamente a su panel
-        btnInicio.addActionListener(e      -> cl.show(mainPanel, "prendas"));
         btnPedidos.addActionListener(e     -> cl.show(mainPanel, "pedidos"));
         btnProveedores.addActionListener(e -> cl.show(mainPanel, "proveedores"));
         btnInventarios.addActionListener(e -> cl.show(mainPanel, "entradas"));
@@ -191,80 +182,62 @@ public class GestorAdministrativo extends JFrame {
         btnCerrar.addActionListener(e      -> { new Login().setVisible(true); dispose(); });
     }
 
-  
-    // PANEL CATÁLOGO (grid de tarjetas)
-  
-
-    private JPanel construirPanelPrendas() {
-        JPanel panel = new JPanel(null);
-        panel.setBackground(new Color(245, 242, 225));
-
-        JTextField txtBuscar = new JTextField("Buscar...");
-        txtBuscar.setFont(new Font("Arial", Font.PLAIN, 13));
-        txtBuscar.setForeground(new Color(150, 150, 150));
-        txtBuscar.setBackground(Color.WHITE);
-        txtBuscar.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
-        txtBuscar.setBounds(10, 15, 280, 32);
-        panel.add(txtBuscar);
-
-        JButton btnNueva = new JButton("+ NUEVA PRENDA");
-        btnNueva.setFont(new Font("Arial", Font.BOLD, 13));
-        btnNueva.setBackground(new Color(130, 190, 140));
-        btnNueva.setForeground(Color.WHITE);
-        btnNueva.setBorderPainted(false);
-        btnNueva.setFocusPainted(false);
-        btnNueva.setOpaque(true);
-        btnNueva.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnNueva.setBounds(620, 12, 165, 36);
-        panel.add(btnNueva);
-
-        // Grid donde se muestran las tarjetas de prendas
-        gridPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 12));
-        gridPanel.setBackground(new Color(245, 242, 225));
-        JScrollPane scroll = new JScrollPane(gridPanel);
-        scroll.setBounds(10, 60, 778, 575);
-        scroll.setBorder(null);
-        scroll.getViewport().setBackground(new Color(245, 242, 225));
-        panel.add(scroll);
-
-        // Al hacer clic abre el formulario para agregar nueva prenda
-        btnNueva.addActionListener(e -> mostrarFormularioNueva());
-
-        return panel;
-    }
-
-    // PANEL GESTIÓN (tabla con EDITAR/ELIMINAR)
+    // PANEL GESTIÓN (tabla con EDITAR/ELIMINAR/DETALLES y buscador)
 
     private JPanel construirPanelGestion() {
         JPanel panel = new JPanel(null);
         panel.setBackground(new Color(245, 242, 225));
 
-        JTextField txtBuscarG = new JTextField("Buscar");
+        // Campo para buscar por nombre o código
+        JTextField txtBuscarG = new JTextField("Ingresa código o nombre de la prenda...");
         txtBuscarG.setFont(new Font("Arial", Font.PLAIN, 13));
+        txtBuscarG.setForeground(new Color(150, 150, 150));
         txtBuscarG.setBackground(Color.WHITE);
         txtBuscarG.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
-        txtBuscarG.setBounds(10, 15, 200, 32);
+        txtBuscarG.setBounds(10, 15, 250, 32);
         panel.add(txtBuscarG);
 
-        JButton btnBuscarG = new JButton("Buscar");
+        // Al hacer clic se borra el placeholder
+        txtBuscarG.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                if (txtBuscarG.getText().equals("Ingresa código o nombre de la prenda...")) {
+                    txtBuscarG.setText("");
+                    txtBuscarG.setForeground(Color.BLACK);
+                }
+            }
+            // Si queda vacío al perder foco, vuelve el placeholder
+            public void focusLost(FocusEvent e) {
+                if (txtBuscarG.getText().isEmpty()) {
+                    txtBuscarG.setText("Ingresa código o nombre de la prenda...");
+                    txtBuscarG.setForeground(new Color(150, 150, 150));
+                }
+            }
+        });
+
+        // Botón para ejecutar la búsqueda
+        JButton btnBuscarG = new JButton("BUSCAR");
+        btnBuscarG.setFont(new Font("Arial", Font.BOLD, 12));
         btnBuscarG.setBackground(new Color(220, 190, 195));
+        btnBuscarG.setForeground(new Color(50, 50, 50));
         btnBuscarG.setBorderPainted(false);
         btnBuscarG.setFocusPainted(false);
         btnBuscarG.setOpaque(true);
-        btnBuscarG.setBounds(215, 15, 80, 32);
+        btnBuscarG.setBounds(270, 15, 80, 32);
         panel.add(btnBuscarG);
 
+        // Etiqueta y combo para filtrar por categoría
         JLabel lblCat = new JLabel("Categoría:");
         lblCat.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblCat.setBounds(310, 20, 70, 20);
+        lblCat.setBounds(365, 20, 70, 20);
         panel.add(lblCat);
 
         String[] cats = {"TODAS", "NEW DROP", "COLECCIONES", "PANTALONES & JEANS",
                          "TOPS & BODIES", "FALDAS & SHORTS", "VESTIDOS", "ACCESORIOS"};
         JComboBox<String> comboCatG = new JComboBox<>(cats);
-        comboCatG.setBounds(385, 15, 180, 32);
+        comboCatG.setBounds(440, 15, 180, 32);
         panel.add(comboCatG);
 
+        // Botón para agregar nueva prenda
         JButton btnNuevaG = new JButton("+ NUEVA PRENDA");
         btnNuevaG.setFont(new Font("Arial", Font.BOLD, 12));
         btnNuevaG.setBackground(new Color(130, 190, 140));
@@ -272,12 +245,12 @@ public class GestorAdministrativo extends JFrame {
         btnNuevaG.setBorderPainted(false);
         btnNuevaG.setFocusPainted(false);
         btnNuevaG.setOpaque(true);
-        btnNuevaG.setBounds(600, 12, 165, 36);
+        btnNuevaG.setBounds(680, 12, 165, 36);
         panel.add(btnNuevaG);
         btnNuevaG.addActionListener(e -> mostrarFormularioNueva());
 
-        // Definición de columnas de la tabla de gestión
-        String[] colsG = {"ID", "IMAGEN", "NOMBRE", "STOCK", "PRECIO", "CATEGORÍA", "ACCIONES"};
+        // Definición de columnas — DETALLES es una columna separada de ACCIONES
+        String[] colsG = {"ID", "IMAGEN", "NOMBRE", "STOCK", "PRECIO", "CATEGORÍA", "ACCIONES", "DETALLES"};
         modeloTabla = new DefaultTableModel(colsG, 0) {
             public boolean isCellEditable(int row, int col) { return false; }
             public Class<?> getColumnClass(int col) {
@@ -311,52 +284,114 @@ public class GestorAdministrativo extends JFrame {
             (t, v, sel, foc, r, c) -> {
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 10));
                 p.setBackground(Color.WHITE);
-                JButton bE  = crearBotonTabla("EDITAR",    new Color(220, 190, 195));
-                JButton bEl = crearBotonTabla("ELIMINAR",  new Color(180, 180, 185));
+                JButton bE  = crearBotonTabla("EDITAR",   new Color(220, 190, 195));
+                JButton bEl = crearBotonTabla("ELIMINAR", new Color(180, 180, 185));
                 p.add(bE); p.add(bEl);
                 return p;
             });
 
+        // Renderer: muestra botón VER DETALLES grande en la columna 7
+        tablaGestion.getColumnModel().getColumn(7).setCellRenderer(
+            (t, v, sel, foc, r, c) -> {
+                JPanel p = new JPanel(new BorderLayout());
+                p.setBackground(Color.WHITE);
+                p.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+                JButton bD = new JButton("<html><center>VER<br>DETALLES</center></html>");
+                bD.setBackground(new Color(100, 160, 220));
+                bD.setForeground(Color.WHITE);
+                bD.setBorderPainted(false);
+                bD.setFocusPainted(false);
+                bD.setFont(new Font("Arial", Font.BOLD, 11));
+                p.add(bD, BorderLayout.CENTER);
+                return p;
+            });
+
         // Anchos de columna
-        int[] anchos = {80, 70, 150, 60, 80, 140, 160};
+        int[] anchos = {70, 65, 140, 55, 75, 130, 160, 110};
         for (int i = 0; i < anchos.length; i++)
             tablaGestion.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
 
-        // Detecta clic en columna ACCIONES y decide si es EDITAR o ELIMINAR
+        // Detecta clic en columna ACCIONES (6) o DETALLES (7)
         tablaGestion.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int row = tablaGestion.rowAtPoint(e.getPoint());
                 int col = tablaGestion.columnAtPoint(e.getPoint());
-                if (col != 6 || row < 0) return;
+                if (row < 0) return;
 
-                int x = e.getX() - tablaGestion.getCellRect(row, col, true).x;
-                if (x < 80) {
-                    // EDITAR: leer datos de la lógica y abrir formulario
-                    Prenda p = gestor.getPrendas().get(row);
-                    mostrarFormularioEditar(row, p.getNombre(),
-                        String.valueOf(p.getPrecio()),
-                        String.valueOf(p.getStock()),
-                        p.getCodigo(),
-                        p.getCategoria(), null, null, null, null);
-                } else {
-                    // ELIMINAR: confirmar, delegar a lógica y refrescar
-                    int ok = JOptionPane.showConfirmDialog(null,
-                        "¿Eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
-                    if (ok == JOptionPane.YES_OPTION) {
-                        // Llama a gestionar(int) — método sobrecargado que elimina por posición
-                        gestor.gestionar(row);
-                        iconosPorFila.remove(row);
-                        refrescarVista();
-                        JOptionPane.showMessageDialog(null, "Se eliminó de la tabla y del catálogo.");
+                if (col == 6) {
+                    // Detecta si es EDITAR o ELIMINAR por posición X
+                    int x = e.getX() - tablaGestion.getCellRect(row, col, true).x;
+                    if (x < 80) {
+                        // EDITAR: abrir formulario con datos actuales
+                        Prenda p = gestor.getPrendas().get(row);
+                        mostrarFormularioEditar(row, p.getNombre(),
+                            String.valueOf(p.getPrecio()),
+                            String.valueOf(p.getStock()),
+                            p.getCodigo(),
+                            p.getCategoria(), null, null, null, null);
+                    } else {
+                        // ELIMINAR: confirmar y eliminar
+                        int ok = JOptionPane.showConfirmDialog(null,
+                            "¿Eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
+                        if (ok == JOptionPane.YES_OPTION) {
+                            // Llama a gestionar(int) — método sobrecargado que elimina por posición
+                            gestor.gestionar(row);
+                            iconosPorFila.remove(row);
+                            refrescarVista();
+                            JOptionPane.showMessageDialog(null, "Prenda eliminada correctamente.");
+                        }
                     }
+                } else if (col == 7) {
+                    // VER DETALLES: abrir ventana con info completa de la prenda
+                    Prenda p = gestor.getPrendas().get(row);
+                    ImageIcon[] iconos = iconosPorFila.get(row);
+                    ImageIcon img = (iconos != null) ? iconos[0] : null;
+                    verDetallesPrenda(p, img);
                 }
             }
         });
 
         JScrollPane scrollG = new JScrollPane(tablaGestion);
-        scrollG.setBounds(10, 60, 778, 570);
+        scrollG.setBounds(10, 60, 848, 570);
         scrollG.setBorder(new LineBorder(new Color(220, 220, 220)));
         panel.add(scrollG);
+
+        // Lógica del buscador — filtra la tabla por texto y categoría
+        Runnable filtrar = () -> {
+            // Leer texto — si tiene placeholder se trata como vacío
+            String texto = txtBuscarG.getText().trim().equals("Ingresa código o nombre de la prenda...") ? "" : txtBuscarG.getText().trim();
+            // Leer categoría seleccionada
+            String categoria = (String) comboCatG.getSelectedItem();
+
+            // Llamar al método sobrecargado que filtra por texto y categoría
+            java.util.List<Prenda> resultado = gestor.gestionar(texto, categoria);
+
+            // Si no hay resultados mostrar ventanita y limpiar campo
+            if (resultado.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No se encontraron prendas con ese criterio.", "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
+                txtBuscarG.setText("Ingresa código o nombre de la prenda...");
+                txtBuscarG.setForeground(new Color(150, 150, 150));
+            } else {
+                // Limpiar tabla y mostrar solo las prendas que coinciden
+                modeloTabla.setRowCount(0);
+                for (Prenda p : resultado) {
+                    int idx = gestor.getPrendas().indexOf(p);
+                    ImageIcon[] iconos = iconosPorFila.get(idx);
+                    ImageIcon iconTabla = (iconos != null) ? iconos[0] : null;
+                    modeloTabla.addRow(new Object[]{
+                        p.getCodigo(), iconTabla, p.getNombre(),
+                        String.valueOf(p.getStock()), "S/. " + p.getPrecio(),
+                        p.getCategoria(), "", ""
+                    });
+                }
+            }
+        };
+
+        // Botón BUSCAR ejecuta el filtro
+        btnBuscarG.addActionListener(e -> filtrar.run());
+
+        // El combo filtra automáticamente al cambiar la categoría
+        comboCatG.addActionListener(e -> filtrar.run());
 
         return panel;
     }
@@ -372,10 +407,10 @@ public class GestorAdministrativo extends JFrame {
     }
     // FORMULARIO: NUEVA PRENDA
 
-    /** Abre el diálogo para registrar una nueva prenda con variantes por talla y color */
+    // Abre el diálogo para registrar una nueva prenda — sin stock, ese se genera por entradas
     private void mostrarFormularioNueva() {
         JDialog dialog = new JDialog(this, "Nueva Prenda", true);
-        dialog.setSize(480, 620);
+        dialog.setSize(480, 380);
         dialog.setLocationRelativeTo(this);
         dialog.setResizable(false);
 
@@ -405,33 +440,16 @@ public class GestorAdministrativo extends JFrame {
         comboCat.setBounds(20, 220, 350, 30);
         panel.add(comboCat);
 
-        // Panel donde aparecen los campos de talla+color dinámicamente
-        JLabel lStock = new JLabel("Stock por talla:");
-        lStock.setFont(new Font("Arial", Font.BOLD, 12));
-        lStock.setBounds(20, 260, 200, 20);
-        panel.add(lStock);
-
-        JPanel panelVariantes = new JPanel(null);
-        panelVariantes.setBackground(new Color(245, 245, 245));
-        panelVariantes.setBounds(20, 282, 430, 180);
-        panel.add(panelVariantes);
-
-        // Cuando cambia la categoría, se regeneran los campos de talla
-        comboCat.addActionListener(e ->
-            construirCamposVariantes(panelVariantes, (String) comboCat.getSelectedItem(), null));
-        // Mostrar tallas de la categoría inicial al abrir el formulario
-        construirCamposVariantes(panelVariantes, (String) comboCat.getSelectedItem(), null);
-
         // Selector de imagen
         JLabel lblRuta = new JLabel("Sin imagen seleccionada");
         lblRuta.setFont(new Font("Arial", Font.ITALIC, 11));
         lblRuta.setForeground(new Color(150, 150, 150));
-        lblRuta.setBounds(20, 470, 230, 20);
+        lblRuta.setBounds(20, 265, 230, 20);
         panel.add(lblRuta);
 
         final File[] imagenSeleccionada = {null};
         JButton btnImg = new JButton("Seleccionar imagen");
-        btnImg.setBounds(260, 466, 150, 26);
+        btnImg.setBounds(260, 261, 150, 26);
         btnImg.setFocusPainted(false);
         btnImg.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
@@ -443,8 +461,8 @@ public class GestorAdministrativo extends JFrame {
         });
         panel.add(btnImg);
 
-        JButton btnGuardar  = crearBotonFormulario("GUARDAR",  new Color(130, 190, 140), 20,  500);
-        JButton btnCancelar = crearBotonFormulario("CANCELAR", new Color(220, 100, 100), 210, 500);
+        JButton btnGuardar  = crearBotonFormulario("GUARDAR",  new Color(130, 190, 140), 20,  300);
+        JButton btnCancelar = crearBotonFormulario("CANCELAR", new Color(220, 100, 100), 210, 300);
         panel.add(btnGuardar);
         panel.add(btnCancelar);
 
@@ -456,24 +474,15 @@ public class GestorAdministrativo extends JFrame {
             String precio    = txtPrecio.getText().trim();
             String categoria = (String) comboCat.getSelectedItem();
 
-            // Validar datos básicos (sin stock, ese viene en variantes)
+            // Validar datos básicos
             String resultado = gestor.validarTodo(nombre, codigo, precio);
             if (!resultado.equals("OK")) {
                 JOptionPane.showMessageDialog(dialog, resultado);
                 return;
             }
 
-            // Leer las variantes que el usuario llenó en el panel
-            List<Variante> variantes = leerVariantesDelPanel(panelVariantes);
-            // Delegar validación de variantes a la lógica
-            String resVariantes = gestor.validarVariantes(variantes);
-            if (!resVariantes.equals("OK")) {
-                JOptionPane.showMessageDialog(dialog, resVariantes);
-                return;
-            }
-
-            // Llama a gestionar(String, String, double, String, List) — método sobrecargado que agrega la prenda
-            gestor.gestionar(codigo, nombre, Double.parseDouble(precio), categoria, variantes);
+            // Agrega la prenda sin variantes — el stock se generará por entradas de mercadería
+            gestor.gestionar(codigo, nombre, Double.parseDouble(precio), categoria, new java.util.ArrayList<>());
 
             // Guardar iconos para esta prenda
             int nuevaFila = gestor.getPrendas().size() - 1;
@@ -491,7 +500,7 @@ public class GestorAdministrativo extends JFrame {
 
     // FORMULARIO: EDITAR PRENDA
 
-    /** Abre el diálogo para editar una prenda existente */
+    // Abre el formulario para editar una prenda existente
     private void mostrarFormularioEditar(int fila, String nombreActual, String precioActual,
             String stockActual, String codigoActual, String categoriaActual,
             JLabel lblNombre, JLabel lblPrecio, JLabel lblInfo, JLabel imgLabel) {
@@ -628,17 +637,10 @@ public class GestorAdministrativo extends JFrame {
     // REFRESCO DE VISTA
     // ─────────────────────────────────────────
 
-    /**
-     * Reconstruye la tabla de gestión y el grid de tarjetas
-     * leyendo la lista de prendas desde InventarioLogica.
-     * La GUI nunca escribe datos directamente: solo lee y pinta.
-     */
+    // Reconstruye la tabla de gestión leyendo la lista desde InventarioLogica
     private void refrescarVista() {
         // Limpiar tabla
         modeloTabla.setRowCount(0);
-
-        // Limpiar grid de tarjetas
-        gridPanel.removeAll();
 
         // Leer la lista actualizada desde la lógica
         java.util.List<Prenda> prendas = gestor.getPrendas();
@@ -646,139 +648,29 @@ public class GestorAdministrativo extends JFrame {
         for (int i = 0; i < prendas.size(); i++) {
             Prenda p = prendas.get(i);
 
-            // Recuperar iconos guardados (pueden ser null si no tiene imagen)
+            // Recuperar icono guardado para la tabla (puede ser null si no tiene imagen)
             ImageIcon[] iconos = iconosPorFila.get(i);
-            ImageIcon iconTabla   = (iconos != null) ? iconos[0] : null;
-            ImageIcon iconTarjeta = (iconos != null) ? iconos[1] : null;
+            ImageIcon iconTabla = (iconos != null) ? iconos[0] : null;
 
-            // Agregar fila a la tabla de gestión
+            // Agregar fila a la tabla de gestión — columna DETALLES vacía, el renderer la pinta
             modeloTabla.addRow(new Object[]{
                 p.getCodigo(), iconTabla, p.getNombre(),
                 String.valueOf(p.getStock()),
                 "S/. " + p.getPrecio(),
-                p.getCategoria(), ""
+                p.getCategoria(), "", ""
             });
-
-            // Agregar tarjeta al catálogo
-            gridPanel.add(crearTarjeta(p, i, iconTarjeta));
         }
-
-        gridPanel.revalidate();
-        gridPanel.repaint();
-    }
-
-    // ─────────────────────────────────────────
-    // TARJETA DEL CATÁLOGO
-    // ─────────────────────────────────────────
-
-    /**
-     * Crea una tarjeta visual para el catálogo.
-     * Recibe el objeto Prenda directamente desde la lógica, no strings sueltos.
-     */
-    private JPanel crearTarjeta(Prenda prenda, int fila, ImageIcon iconTarjeta) {
-        return crearTarjeta(prenda.getNombre(), String.valueOf(prenda.getPrecio()),
-                            prenda.getCodigo(), String.valueOf(prenda.getStock()),
-                            iconTarjeta, fila);
-    }
-
-    /** Construye visualmente la tarjeta con los datos recibidos */
-    private JPanel crearTarjeta(String nombre, String precio, String codigo,
-                                String stock, ImageIcon iconTarjeta, int filaTabla) {
-        JPanel card = new JPanel(null);
-        card.setBackground(Color.WHITE);
-        card.setBorder(new LineBorder(new Color(220, 220, 220), 1, true));
-        card.setPreferredSize(new Dimension(185, 235));
-
-        // Imagen de la prenda (ya viene escalada desde iconosPorFila)
-        JLabel imgLabel = new JLabel("", SwingConstants.CENTER);
-        imgLabel.setBackground(new Color(230, 230, 230));
-        imgLabel.setOpaque(true);
-        if (iconTarjeta != null)
-            imgLabel.setIcon(iconTarjeta);
-        imgLabel.setBounds(1, 1, 183, 140);
-        card.add(imgLabel);
-
-        JLabel lblNombre = new JLabel(nombre, SwingConstants.CENTER);
-        lblNombre.setFont(new Font("Arial", Font.BOLD, 12));
-        lblNombre.setBounds(5, 145, 175, 18);
-        card.add(lblNombre);
-
-        JLabel lblPrecio = new JLabel("S/. " + precio, SwingConstants.CENTER);
-        lblPrecio.setFont(new Font("Arial", Font.PLAIN, 11));
-        lblPrecio.setForeground(new Color(80, 80, 80));
-        lblPrecio.setBounds(5, 163, 175, 16);
-        card.add(lblPrecio);
-
-        JLabel lblInfo = new JLabel("ID: " + codigo + "   Stock: " + stock, SwingConstants.CENTER);
-        lblInfo.setFont(new Font("Arial", Font.PLAIN, 10));
-        lblInfo.setForeground(new Color(130, 130, 130));
-        lblInfo.setBounds(5, 179, 175, 14);
-        card.add(lblInfo);
-
-        JButton btnEditar = new JButton("EDITAR");
-        btnEditar.setFont(new Font("Arial", Font.BOLD, 10));
-        btnEditar.setBackground(new Color(100, 160, 220));
-        btnEditar.setForeground(Color.WHITE);
-        btnEditar.setBorderPainted(false);
-        btnEditar.setFocusPainted(false);
-        btnEditar.setOpaque(true);
-        btnEditar.setBounds(5, 200, 82, 24);
-        card.add(btnEditar);
-
-        JButton btnEliminar = new JButton("ELIMINAR");
-        btnEliminar.setFont(new Font("Arial", Font.BOLD, 10));
-        btnEliminar.setBackground(new Color(220, 100, 100));
-        btnEliminar.setForeground(Color.WHITE);
-        btnEliminar.setBorderPainted(false);
-        btnEliminar.setFocusPainted(false);
-        btnEliminar.setOpaque(true);
-        btnEliminar.setBounds(95, 200, 85, 24);
-        card.add(btnEliminar);
-
-        // Eliminar: confirmar, delegar a lógica y refrescar
-        btnEliminar.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(card,
-                "¿Deseas eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                int idx = gridPanel.getComponentZOrder(card);
-                // Llama a gestionar(int) — método sobrecargado que elimina por posición
-                gestor.gestionar(idx);
-                iconosPorFila.remove(idx);
-                refrescarVista();
-                JOptionPane.showMessageDialog(null, "Se eliminó de la tabla y del catálogo.");
-            }
-        });
-
-        // Editar: leer datos de la lógica y abrir formulario
-        btnEditar.addActionListener(e -> {
-            int fila = gridPanel.getComponentZOrder(card);
-            Prenda p = gestor.getPrendas().get(fila);
-            mostrarFormularioEditar(fila,
-                p.getNombre(), String.valueOf(p.getPrecio()),
-                String.valueOf(p.getStock()), p.getCodigo(), p.getCategoria(),
-                null, null, null, null);
-        });
-
-        // Clic en la tarjeta (no en los botones) abre los detalles
-        card.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                int fila = gridPanel.getComponentZOrder(card);
-                Prenda p = gestor.getPrendas().get(fila);
-                verDetallesPrenda(p);
-            }
-        });
-
-        return card;
     }
 
     // ─────────────────────────────────────────
     // VER DETALLES DE PRENDA
     // ─────────────────────────────────────────
 
-    // Abre un diálogo con toda la info de la prenda y su tabla de variantes
-    private void verDetallesPrenda(Prenda prenda) {
+    // Abre un diálogo con toda la info de la prenda, filtro por talla/color,
+    // y tablas de entradas y salidas
+    private void verDetallesPrenda(Prenda prenda, ImageIcon imagen) {
         JDialog dlg = new JDialog(this, "Detalles de Prenda", true);
-        dlg.setSize(450, 400);
+        dlg.setSize(520, 650);
         dlg.setLocationRelativeTo(this);
         dlg.setResizable(false);
 
@@ -786,83 +678,168 @@ public class GestorAdministrativo extends JFrame {
         panel.setBackground(Color.WHITE);
         dlg.setContentPane(panel);
 
-        // Título con el nombre de la prenda
-        JLabel lblTitulo = new JLabel(prenda.getNombre());
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
-        lblTitulo.setBounds(20, 15, 400, 25);
+        // ── Imagen arriba ──
+        JLabel lblImagen = new JLabel("", SwingConstants.CENTER);
+        lblImagen.setBackground(new Color(230, 230, 230));
+        lblImagen.setOpaque(true);
+        if (imagen != null) {
+            Image img = imagen.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            lblImagen.setIcon(new ImageIcon(img));
+        }
+        lblImagen.setBounds(200, 10, 100, 100);
+        panel.add(lblImagen);
+
+        // ── Nombre y datos básicos ──
+        JLabel lblTitulo = new JLabel(prenda.getNombre(), SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 15));
+        lblTitulo.setBounds(20, 115, 470, 22);
         panel.add(lblTitulo);
 
-        // Datos básicos
-        JLabel lblCodigo = new JLabel("Código: " + prenda.getCodigo());
-        lblCodigo.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblCodigo.setBounds(20, 48, 200, 20);
+        JLabel lblCodigo = new JLabel("Código: " + prenda.getCodigo() + "   |   Categoría: " + prenda.getCategoria() + "   |   Precio: S/. " + prenda.getPrecio());
+        lblCodigo.setFont(new Font("Arial", Font.PLAIN, 11));
+        lblCodigo.setBounds(20, 140, 470, 18);
         panel.add(lblCodigo);
 
-        JLabel lblCategoria = new JLabel("Categoría: " + prenda.getCategoria());
-        lblCategoria.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblCategoria.setBounds(20, 68, 300, 20);
-        panel.add(lblCategoria);
-
-        JLabel lblPrecio = new JLabel("Precio: S/. " + prenda.getPrecio());
-        lblPrecio.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblPrecio.setBounds(20, 88, 200, 20);
-        panel.add(lblPrecio);
-
+        // Stock total — se actualiza al filtrar
         JLabel lblStockTotal = new JLabel("Stock total: " + prenda.getStock() + " uds");
         lblStockTotal.setFont(new Font("Arial", Font.BOLD, 12));
         lblStockTotal.setForeground(new Color(80, 140, 80));
-        lblStockTotal.setBounds(20, 108, 200, 20);
+        lblStockTotal.setBounds(20, 160, 200, 18);
         panel.add(lblStockTotal);
 
-        // Separador visual
         JSeparator sep = new JSeparator();
-        sep.setBounds(20, 135, 400, 2);
+        sep.setBounds(20, 183, 470, 2);
         panel.add(sep);
 
-        // Título de la tabla de variantes
-        JLabel lblVariantes = new JLabel("Stock por talla y color:");
-        lblVariantes.setFont(new Font("Arial", Font.BOLD, 12));
-        lblVariantes.setBounds(20, 142, 250, 20);
-        panel.add(lblVariantes);
+        // ── Filtros talla y color ──
+        JLabel lFiltro = new JLabel("Filtrar por:");
+        lFiltro.setFont(new Font("Arial", Font.BOLD, 12));
+        lFiltro.setBounds(20, 190, 80, 20);
+        panel.add(lFiltro);
 
-        // Tabla con las variantes (talla, color, stock)
-        String[] columnas = {"Talla", "Color", "Stock"};
-        DefaultTableModel modeloVariantes = new DefaultTableModel(columnas, 0) {
-            public boolean isCellEditable(int r, int c) { return false; } // solo lectura
+        // Combo de tallas — "TODAS" más las tallas de las variantes
+        java.util.Set<String> tallasSet = new java.util.LinkedHashSet<>();
+        tallasSet.add("TODAS");
+        for (Variante v : prenda.getVariantes()) tallasSet.add(v.getTalla());
+        JComboBox<String> comboTalla = new JComboBox<>(tallasSet.toArray(new String[0]));
+        comboTalla.setBounds(105, 188, 100, 26);
+        panel.add(comboTalla);
+
+        // Combo de colores — "TODOS" más los colores de las variantes
+        java.util.Set<String> coloresSet = new java.util.LinkedHashSet<>();
+        coloresSet.add("TODOS");
+        for (Variante v : prenda.getVariantes()) coloresSet.add(v.getColor());
+        JComboBox<String> comboColor = new JComboBox<>(coloresSet.toArray(new String[0]));
+        comboColor.setBounds(215, 188, 120, 26);
+        panel.add(comboColor);
+
+        // ── Tabla de stock por variante ──
+        JLabel lblStock = new JLabel("Stock por variante:");
+        lblStock.setFont(new Font("Arial", Font.BOLD, 12));
+        lblStock.setBounds(20, 225, 200, 18);
+        panel.add(lblStock);
+
+        String[] colsStock = {"Talla", "Color", "Stock"};
+        DefaultTableModel modeloStock = new DefaultTableModel(colsStock, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
         };
+        JTable tablaStock = new JTable(modeloStock);
+        tablaStock.setRowHeight(24);
+        tablaStock.setFont(new Font("Arial", Font.PLAIN, 12));
+        tablaStock.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        tablaStock.getTableHeader().setBackground(new Color(240, 235, 225));
+        tablaStock.setBackground(Color.WHITE);
+        tablaStock.setGridColor(new Color(220, 220, 220));
+        JScrollPane scrollStock = new JScrollPane(tablaStock);
+        scrollStock.setBounds(20, 245, 470, 90);
+        panel.add(scrollStock);
 
-        // Llenar la tabla con las variantes de la prenda
-        for (Variante v : prenda.getVariantes()) {
-            modeloVariantes.addRow(new Object[]{v.getTalla(), v.getColor(), v.getStock()});
-        }
+        // ── Tabla de entradas (verde) ──
+        JLabel lblEntradas = new JLabel("Entradas de mercadería:");
+        lblEntradas.setFont(new Font("Arial", Font.BOLD, 12));
+        lblEntradas.setForeground(new Color(60, 130, 60));
+        lblEntradas.setBounds(20, 345, 220, 18);
+        panel.add(lblEntradas);
 
-        // Si no tiene variantes, mostrar mensaje
-        if (prenda.getVariantes().isEmpty()) {
-            modeloVariantes.addRow(new Object[]{"—", "Sin variantes registradas", "—"});
-        }
+        String[] colsEntradas = {"Proveedor", "Cantidad", "Fecha"};
+        DefaultTableModel modeloEntradas = new DefaultTableModel(colsEntradas, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable tablaEntradas = new JTable(modeloEntradas);
+        tablaEntradas.setRowHeight(24);
+        tablaEntradas.setFont(new Font("Arial", Font.PLAIN, 12));
+        tablaEntradas.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        tablaEntradas.getTableHeader().setBackground(new Color(220, 240, 220));
+        tablaEntradas.setBackground(Color.WHITE);
+        tablaEntradas.setGridColor(new Color(200, 230, 200));
+        JScrollPane scrollEntradas = new JScrollPane(tablaEntradas);
+        scrollEntradas.setBounds(20, 365, 470, 80);
+        panel.add(scrollEntradas);
 
-        JTable tabla = new JTable(modeloVariantes);
-        tabla.setRowHeight(25);
-        tabla.setFont(new Font("Arial", Font.PLAIN, 12));
-        tabla.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
-        tabla.getTableHeader().setBackground(new Color(240, 235, 225));
-        tabla.setBackground(Color.WHITE);
-        tabla.setGridColor(new Color(220, 220, 220));
+        // ── Tabla de salidas (rojo) ──
+        JLabel lblSalidas = new JLabel("Salidas (ventas):");
+        lblSalidas.setFont(new Font("Arial", Font.BOLD, 12));
+        lblSalidas.setForeground(new Color(180, 60, 60));
+        lblSalidas.setBounds(20, 453, 200, 18);
+        panel.add(lblSalidas);
 
-        JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBounds(20, 165, 400, 160);
-        panel.add(scroll);
+        String[] colsSalidas = {"Cliente", "Cantidad", "Fecha"};
+        DefaultTableModel modeloSalidas = new DefaultTableModel(colsSalidas, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable tablaSalidas = new JTable(modeloSalidas);
+        tablaSalidas.setRowHeight(24);
+        tablaSalidas.setFont(new Font("Arial", Font.PLAIN, 12));
+        tablaSalidas.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        tablaSalidas.getTableHeader().setBackground(new Color(240, 220, 220));
+        tablaSalidas.setBackground(Color.WHITE);
+        tablaSalidas.setGridColor(new Color(230, 200, 200));
+        JScrollPane scrollSalidas = new JScrollPane(tablaSalidas);
+        scrollSalidas.setBounds(20, 473, 470, 80);
+        panel.add(scrollSalidas);
 
-        // Botón cerrar
+        // ── Botón cerrar ──
         JButton btnCerrar = new JButton("CERRAR");
         btnCerrar.setBackground(new Color(220, 190, 195));
         btnCerrar.setForeground(new Color(50, 50, 50));
         btnCerrar.setBorderPainted(false);
         btnCerrar.setFocusPainted(false);
         btnCerrar.setOpaque(true);
-        btnCerrar.setBounds(160, 335, 120, 30);
+        btnCerrar.setBounds(185, 565, 120, 30);
         btnCerrar.addActionListener(e -> dlg.dispose());
         panel.add(btnCerrar);
+
+        // ── Lógica del filtro ──
+        // Rellena la tabla de stock según talla y color seleccionados
+        Runnable filtrarVariantes = () -> {
+            String talla = (String) comboTalla.getSelectedItem();
+            String color = (String) comboColor.getSelectedItem();
+            modeloStock.setRowCount(0);
+            int stockFiltrado = 0;
+            for (Variante v : prenda.getVariantes()) {
+                boolean coincideTalla = talla.equals("TODAS") || v.getTalla().equals(talla);
+                boolean coincideColor = color.equals("TODOS") || v.getColor().equalsIgnoreCase(color);
+                if (coincideTalla && coincideColor) {
+                    modeloStock.addRow(new Object[]{v.getTalla(), v.getColor(), v.getStock()});
+                    stockFiltrado += v.getStock();
+                }
+            }
+            if (modeloStock.getRowCount() == 0)
+                modeloStock.addRow(new Object[]{"—", "Sin variantes", "—"});
+            // Actualizar label de stock según filtro
+            lblStockTotal.setText(talla.equals("TODAS") && color.equals("TODOS")
+                ? "Stock total: " + prenda.getStock() + " uds"
+                : "Stock filtrado: " + stockFiltrado + " uds");
+
+            // TODO: filtrar entradas y salidas por talla+color cuando se conecte la lógica
+        };
+
+        // Aplicar filtro al cambiar combos
+        comboTalla.addActionListener(e -> filtrarVariantes.run());
+        comboColor.addActionListener(e -> filtrarVariantes.run());
+
+        // Cargar datos iniciales
+        filtrarVariantes.run();
 
         dlg.setVisible(true);
     }
@@ -871,10 +848,7 @@ public class GestorAdministrativo extends JFrame {
     // AUXILIARES DE VARIANTES
     // ─────────────────────────────────────────
 
-    /**
-     * Devuelve las tallas que corresponden a cada categoría.
-     * Pantalones usan tallas numéricas, el resto usa XS-XL, accesorios es talla única.
-     */
+    // Devuelve las tallas según la categoría — pantalones usan números, accesorios talla única
     private String[] tallasParaCategoria(String categoria) {
         if (categoria.contains("PANTALONES")) {
             return new String[]{"26", "28", "30", "32", "34"};
@@ -885,11 +859,8 @@ public class GestorAdministrativo extends JFrame {
         }
     }
 
-    /**
-     * Construye dinámicamente los campos de stock por talla dentro del panelVariantes.
-     * Cada fila muestra: [Talla] [Color____] [Stock: 0]
-     * Si se pasan variantesActuales (al editar), precarga los valores existentes.
-     */
+    // Construye los campos de talla+color+stock en el panel de variantes
+    // Si se pasan variantes actuales (al editar), precarga los valores
     private void construirCamposVariantes(JPanel panelVariantes, String categoria,
                                           List<Variante> variantesActuales) {
         panelVariantes.removeAll();  // limpiar campos anteriores
@@ -944,11 +915,7 @@ public class GestorAdministrativo extends JFrame {
         panelVariantes.repaint();
     }
 
-    /**
-     * Lee los campos del panelVariantes y construye la lista de Variante.
-     * Incluye TODAS las filas para que la lógica pueda validarlas correctamente.
-     * Las filas con placeholder "Color" se incluyen con color vacío para que la lógica las detecte.
-     */
+    // Lee los campos del panel de variantes y arma la lista de Variante
     private List<Variante> leerVariantesDelPanel(JPanel panelVariantes) {
         List<Variante> variantes = new java.util.ArrayList<>();
         Component[] componentes = panelVariantes.getComponents();
@@ -979,7 +946,7 @@ public class GestorAdministrativo extends JFrame {
     // UTILIDADES DE GUI
     // ─────────────────────────────────────────
 
-    /** Carga y escala una imagen desde un archivo. Retorna null si falla */
+    // Carga y escala una imagen desde un archivo — retorna null si falla
     private ImageIcon cargarIcono(File archivo, int w, int h, Component parent) {
         if (archivo == null) return null;
         try {

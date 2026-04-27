@@ -49,6 +49,27 @@ public class InventarioLogica {
         return false;
     }
 
+    // Recibe texto y categoría → filtra prendas por nombre/código y categoría
+    // Si texto está vacío, no filtra por texto
+    // Si categoria es "TODAS", no filtra por categoría
+    public List<Prenda> gestionar(String texto, String categoria) {
+        List<Prenda> filtradas = new ArrayList<>();
+        for (Prenda p : listaPrendas) {
+            // Verifica si el nombre o código contiene el texto buscado
+            boolean coincideTexto = texto.isEmpty()
+                || p.getCodigo().toLowerCase().contains(texto.toLowerCase())
+                || p.getNombre().toLowerCase().contains(texto.toLowerCase());
+            // Verifica si la categoría coincide (o si es TODAS)
+            boolean coincideCategoria = categoria.equals("TODAS")
+                || p.getCategoria().equalsIgnoreCase(categoria);
+            // Solo agrega si cumple ambos filtros
+            if (coincideTexto && coincideCategoria) {
+                filtradas.add(p);
+            }
+        }
+        return filtradas;
+    }
+
     
     // ─────────────────────────────────────────
     // OTROS MÉTODOS
@@ -133,4 +154,13 @@ public class InventarioLogica {
         }
         return true;
     }
+ // Devuelve lista de prendas en formato "CODIGO - Nombre" para mostrar en combo
+    public List<String> getPrendasFormato() {
+        List<String> lista = new ArrayList<>();
+        for (Prenda p : listaPrendas) {
+            lista.add(p.getCodigo() + " - " + p.getNombre());
+        }
+        return lista;
+    }
+
 }

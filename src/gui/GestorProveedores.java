@@ -13,10 +13,11 @@ public class GestorProveedores extends JPanel {
     // Tabla donde se muestran los proveedores registrados
     private DefaultTableModel modeloTabla;
 
-    // Objeto de lógica que maneja la lista de proveedores
-    private ProveedorLogica gestor = new ProveedorLogica();
+    // Objeto de lógica que maneja la lista de proveedores — recibido desde GestorAdministrativo
+    private ProveedorLogica gestor;
 
-    public GestorProveedores() {
+    public GestorProveedores(ProveedorLogica gestor) {
+        this.gestor = gestor;
         setLayout(null);
         setBackground(new Color(245, 242, 225)); // fondo crema del proyecto
 
@@ -159,7 +160,7 @@ public class GestorProveedores extends JPanel {
                 modeloTabla.addRow(new Object[]{p.getCodigo(), p.getNombre(), p.getRuc(), p.getTelefono()});
             }
 
-            // Avisamos que se guardó correctamente y cerramos el formulario
+            // Avisamos que se guardó correctamente
             JOptionPane.showMessageDialog(dlg, "Proveedor registrado correctamente.");
             dlg.dispose();
         });

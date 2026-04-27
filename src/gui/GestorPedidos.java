@@ -5,7 +5,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 // Panel de gestión de pedidos
-// Se incrusta dentro de GestorAdministrativo usando CardLayout
+// dentro de GestorAdministrativo usando CardLayout
 public class GestorPedidos extends JPanel {
 
     public GestorPedidos() {
