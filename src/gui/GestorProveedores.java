@@ -13,29 +13,24 @@ public class GestorProveedores extends JPanel {
     // Tabla donde se muestran los proveedores registrados
     private DefaultTableModel modeloTabla;
 
-<<<<<<< HEAD
-    // Objeto de lógica que maneja la lista de proveedores — recibido desde GestorAdministrativo
+    // Objeto de lógica recibido desde GestorAdministrativo — lista compartida
     private ProveedorLogica gestor;
-=======
-    // Objeto de lógica que maneja la lista de proveedores
-    private ProveedorLogica gestor = new ProveedorLogica();
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
 
     public GestorProveedores(ProveedorLogica gestor) {
         this.gestor = gestor;
         setLayout(null);
-        setBackground(new Color(245, 242, 225)); // fondo crema del proyecto
+        setBackground(new Color(245, 242, 225));
 
-        // ── Título ──
+        // Título
         JLabel lblTitulo = new JLabel("Gestión de Proveedores");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 18));
         lblTitulo.setBounds(20, 15, 300, 30);
         add(lblTitulo);
 
-        // ── Botón nuevo proveedor ──
+        // Botón para abrir el formulario de nuevo proveedor
         JButton btnNuevo = new JButton("+ NUEVO PROVEEDOR");
         btnNuevo.setFont(new Font("Arial", Font.BOLD, 13));
-        btnNuevo.setBackground(new Color(130, 190, 140)); // verde
+        btnNuevo.setBackground(new Color(130, 190, 140));
         btnNuevo.setForeground(Color.WHITE);
         btnNuevo.setBorderPainted(false);
         btnNuevo.setFocusPainted(false);
@@ -44,10 +39,10 @@ public class GestorProveedores extends JPanel {
         btnNuevo.setBounds(580, 15, 190, 36);
         add(btnNuevo);
 
-        // ── Tabla de proveedores ──
+        // Tabla que muestra los proveedores registrados
         String[] columnas = {"Código", "Nombre", "RUC", "Teléfono"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
-            public boolean isCellEditable(int r, int c) { return false; } // solo lectura
+            public boolean isCellEditable(int r, int c) { return false; }
         };
 
         JTable tabla = new JTable(modeloTabla);
@@ -64,13 +59,11 @@ public class GestorProveedores extends JPanel {
         scroll.setBorder(new LineBorder(new Color(220, 220, 220)));
         add(scroll);
 
-        // ── Acción del botón: abre formulario ──
         btnNuevo.addActionListener(e -> abrirFormulario());
     }
 
-    // Abre el diálogo para registrar un nuevo proveedor
+    // Abre el formulario para registrar un nuevo proveedor
     private void abrirFormulario() {
-        // Busca la ventana padre para centrar el diálogo
         JFrame ventanaPadre = (JFrame) SwingUtilities.getWindowAncestor(this);
         JDialog dlg = new JDialog(ventanaPadre, "Nuevo Proveedor", true);
         dlg.setSize(400, 380);
@@ -81,7 +74,6 @@ public class GestorProveedores extends JPanel {
         panel.setBackground(Color.WHITE);
         dlg.setContentPane(panel);
 
-        // ── Campos del formulario ──
         JLabel lCodigo = new JLabel("Código (ej: PRV001):");
         lCodigo.setBounds(20, 20, 180, 20);
         panel.add(lCodigo);
@@ -110,9 +102,8 @@ public class GestorProveedores extends JPanel {
         txtTelefono.setBounds(20, 222, 350, 30);
         panel.add(txtTelefono);
 
-        // ── Botones guardar y cancelar ──
         JButton btnGuardar = new JButton("GUARDAR");
-        btnGuardar.setBackground(new Color(130, 190, 140)); // verde
+        btnGuardar.setBackground(new Color(130, 190, 140));
         btnGuardar.setForeground(Color.WHITE);
         btnGuardar.setBorderPainted(false);
         btnGuardar.setFocusPainted(false);
@@ -121,7 +112,7 @@ public class GestorProveedores extends JPanel {
         panel.add(btnGuardar);
 
         JButton btnCancelar = new JButton("CANCELAR");
-        btnCancelar.setBackground(new Color(220, 100, 100)); // rojo
+        btnCancelar.setBackground(new Color(220, 100, 100));
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setBorderPainted(false);
         btnCancelar.setFocusPainted(false);
@@ -132,48 +123,34 @@ public class GestorProveedores extends JPanel {
         btnCancelar.addActionListener(e -> dlg.dispose());
 
         btnGuardar.addActionListener(e -> {
-            // Leemos lo que el usuario escribió en cada campo y quitamos espacios
+            // Leer campos y quitar espacios
             String codigo   = txtCodigo.getText().trim().toUpperCase();
             String nombre   = txtNombre.getText().trim();
             String ruc      = txtRuc.getText().trim();
             String telefono = txtTelefono.getText().trim();
 
-            // Si algún campo está vacío, avisamos y no seguimos
+            // Verificar que ningún campo esté vacío
             if (codigo.isEmpty() || nombre.isEmpty() || ruc.isEmpty() || telefono.isEmpty()) {
                 JOptionPane.showMessageDialog(dlg, "Todos los campos son obligatorios.");
                 return;
             }
 
-            // Validamos el formato de los datos con la lógica
-            // — código tipo ABC123, nombre solo letras, RUC 11 dígitos, teléfono 9 dígitos
+            // Validar formato con la lógica
             String resultado = gestor.validar(codigo, nombre, ruc, telefono);
-
-            // Si la validación no retornó "OK", mostramos el error y no seguimos
             if (!resultado.equals("OK")) {
                 JOptionPane.showMessageDialog(dlg, resultado);
                 return;
             }
 
-            // Guardamos el proveedor en la lista de ProveedorLogica
-<<<<<<< HEAD
-            gestor.agregarProveedor(codigo, nombre, ruc, telefono);
-=======
-            gestor.Gestionproveedor(codigo, nombre, ruc, telefono);
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
+            // Guardar el proveedor usando el método sobrecargado gestionar
+            gestor.gestionar(codigo, nombre, ruc, telefono);
 
-            // Limpiamos la tabla para no duplicar filas
+            // Recargar la tabla desde la lista actualizada
             modeloTabla.setRowCount(0);
-
-            // Recargamos la tabla leyendo la lista actualizada desde la lógica
             for (Proveedor p : gestor.getProveedores()) {
                 modeloTabla.addRow(new Object[]{p.getCodigo(), p.getNombre(), p.getRuc(), p.getTelefono()});
             }
 
-<<<<<<< HEAD
-            // Avisamos que se guardó correctamente
-=======
-            // Avisamos que se guardó correctamente y cerramos el formulario
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
             JOptionPane.showMessageDialog(dlg, "Proveedor registrado correctamente.");
             dlg.dispose();
         });

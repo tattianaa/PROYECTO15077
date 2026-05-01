@@ -29,10 +29,8 @@ public class GestorAdministrativo extends JFrame {
     private java.util.Map<Integer, ImageIcon[]> iconosPorFila = new java.util.HashMap<>();
 
     // Botones del sidebar — declarados como campos para conectarlos al CardLayout
-<<<<<<< HEAD
-=======
+
     private JButton btnInicio;
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
     private JButton btnPedidos;
     private JButton btnProveedores;
     private JButton btnInventarios;
@@ -84,7 +82,6 @@ public class GestorAdministrativo extends JFrame {
         // Botones de navegación del sidebar — declarados individualmente
         // para que el diseñador visual de Eclipse los reconozca
 
-<<<<<<< HEAD
         JButton btnGestion = new JButton("📋  PANEL DE GESTIÓN");
         btnGestion.setFont(new Font("Arial", Font.PLAIN, 12));
         btnGestion.setForeground(new Color(60, 60, 60));
@@ -95,18 +92,6 @@ public class GestorAdministrativo extends JFrame {
         btnGestion.setHorizontalAlignment(SwingConstants.LEFT);
         btnGestion.setBounds(5, 65, 228, 30);
         sidebar.add(btnGestion);
-=======
-        JButton btnInicio = new JButton("🏠  INICIO");
-        btnInicio.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnInicio.setForeground(new Color(60, 60, 60));
-        btnInicio.setBackground(Color.WHITE);
-        btnInicio.setBorderPainted(false);
-        btnInicio.setFocusPainted(false);
-        btnInicio.setOpaque(true);
-        btnInicio.setHorizontalAlignment(SwingConstants.LEFT);
-        btnInicio.setBounds(5, 65, 228, 30);
-        sidebar.add(btnInicio);
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
 
         JButton btnPedidos = new JButton("📦  GESTIÓN DE PEDIDOS");
         btnPedidos.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -163,24 +148,7 @@ public class GestorAdministrativo extends JFrame {
         btnCerrar.setBounds(5, 240, 228, 30);
         sidebar.add(btnCerrar);
 
-<<<<<<< HEAD
         // Guardar referencia a los botones para conectarlos en construirPanelPrincipal
-      
-=======
-        JButton btnGestion = new JButton("📋  PANEL DE GESTIÓN");
-        btnGestion.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnGestion.setForeground(new Color(60, 60, 60));
-        btnGestion.setBackground(Color.WHITE);
-        btnGestion.setBorderPainted(false);
-        btnGestion.setFocusPainted(false);
-        btnGestion.setOpaque(true);
-        btnGestion.setHorizontalAlignment(SwingConstants.LEFT);
-        btnGestion.setBounds(5, 275, 228, 30);
-        sidebar.add(btnGestion);
-
-        // Guardar referencia a los botones para conectarlos en construirPanelPrincipal
-        this.btnInicio      = btnInicio;
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
         this.btnPedidos     = btnPedidos;
         this.btnProveedores = btnProveedores;
         this.btnInventarios = btnInventarios;
@@ -190,31 +158,21 @@ public class GestorAdministrativo extends JFrame {
         return sidebar;
     }
 
-<<<<<<< HEAD
+
     //Construye el panel principal con CardLayout (pedidos, gestión, proveedores, entradas)
     private void construirPanelPrincipal() {
         JPanel mainPanel = new JPanel(new CardLayout());
         mainPanel.setBounds(242, 0, 858, 650);
         contentPane.add(mainPanel);
 
-        // Panel de gestión es el principal — ya no existe el catálogo de tarjetas
-        mainPanel.add(construirPanelGestion(),   "gestion");
-        mainPanel.add(new GestorPedidos(),       "pedidos");
-        mainPanel.add(new GestorProveedores(gestorProveedores),   "proveedores");
+        // Panel de gestión es el principal
+        mainPanel.add(construirPanelGestion(),                       "gestion");
+        mainPanel.add(new GestorPedidos(),                           "pedidos");
+        mainPanel.add(new GestorProveedores(gestorProveedores),      "proveedores");
         mainPanel.add(new GestorEntradas(gestor, gestorProveedores), "entradas");
-=======
-    //Construye el panel principal con CardLayout (prendas, pedidos, gestión)
-    private void construirPanelPrincipal() {
-        JPanel mainPanel = new JPanel(new CardLayout());
-        mainPanel.setBounds(242, 0, 758, 650);
-        contentPane.add(mainPanel);
-
-        mainPanel.add(construirPanelPrendas(),   "prendas");
-        mainPanel.add(new GestorPedidos(),       "pedidos");
-        mainPanel.add(construirPanelGestion(),   "gestion");
-        mainPanel.add(new GestorProveedores(),   "proveedores");
-        mainPanel.add(new GestorEntradas(),      "entradas");
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
+        mainPanel.add(new GestorPedidos(),                           "pedidos");
+        mainPanel.add(new GestorProveedores(gestorProveedores),      "proveedores");
+        mainPanel.add(new GestorEntradas(gestor, gestorProveedores), "entradas");
 
         // Navegación entre paneles usando CardLayout
         CardLayout cl = (CardLayout) mainPanel.getLayout();
@@ -222,10 +180,6 @@ public class GestorAdministrativo extends JFrame {
         cl.show(mainPanel, "gestion");
 
         // Conectar cada botón del sidebar directamente a su panel
-<<<<<<< HEAD
-=======
-        btnInicio.addActionListener(e      -> cl.show(mainPanel, "prendas"));
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
         btnPedidos.addActionListener(e     -> cl.show(mainPanel, "pedidos"));
         btnProveedores.addActionListener(e -> cl.show(mainPanel, "proveedores"));
         btnInventarios.addActionListener(e -> cl.show(mainPanel, "entradas"));
@@ -233,53 +187,7 @@ public class GestorAdministrativo extends JFrame {
         btnCerrar.addActionListener(e      -> { new Login().setVisible(true); dispose(); });
     }
 
-<<<<<<< HEAD
     // PANEL GESTIÓN (tabla con EDITAR/ELIMINAR/DETALLES y buscador)
-=======
-  
-    // PANEL CATÁLOGO (grid de tarjetas)
-  
-
-    private JPanel construirPanelPrendas() {
-        JPanel panel = new JPanel(null);
-        panel.setBackground(new Color(245, 242, 225));
-
-        JTextField txtBuscar = new JTextField("Buscar...");
-        txtBuscar.setFont(new Font("Arial", Font.PLAIN, 13));
-        txtBuscar.setForeground(new Color(150, 150, 150));
-        txtBuscar.setBackground(Color.WHITE);
-        txtBuscar.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
-        txtBuscar.setBounds(10, 15, 280, 32);
-        panel.add(txtBuscar);
-
-        JButton btnNueva = new JButton("+ NUEVA PRENDA");
-        btnNueva.setFont(new Font("Arial", Font.BOLD, 13));
-        btnNueva.setBackground(new Color(130, 190, 140));
-        btnNueva.setForeground(Color.WHITE);
-        btnNueva.setBorderPainted(false);
-        btnNueva.setFocusPainted(false);
-        btnNueva.setOpaque(true);
-        btnNueva.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnNueva.setBounds(620, 12, 165, 36);
-        panel.add(btnNueva);
-
-        // Grid donde se muestran las tarjetas de prendas
-        gridPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 12));
-        gridPanel.setBackground(new Color(245, 242, 225));
-        JScrollPane scroll = new JScrollPane(gridPanel);
-        scroll.setBounds(10, 60, 778, 575);
-        scroll.setBorder(null);
-        scroll.getViewport().setBackground(new Color(245, 242, 225));
-        panel.add(scroll);
-
-        // Al hacer clic abre el formulario para agregar nueva prenda
-        btnNueva.addActionListener(e -> mostrarFormularioNueva());
-
-        return panel;
-    }
-
-    // PANEL GESTIÓN (tabla con EDITAR/ELIMINAR)
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
 
     private JPanel construirPanelGestion() {
         JPanel panel = new JPanel(null);
@@ -414,8 +322,6 @@ public class GestorAdministrativo extends JFrame {
                 int row = tablaGestion.rowAtPoint(e.getPoint());
                 int col = tablaGestion.columnAtPoint(e.getPoint());
                 if (row < 0) return;
-
-<<<<<<< HEAD
                 if (col == 6) {
                     // Detecta si es EDITAR o ELIMINAR por posición X
                     int x = e.getX() - tablaGestion.getCellRect(row, col, true).x;
@@ -432,33 +338,11 @@ public class GestorAdministrativo extends JFrame {
                         int ok = JOptionPane.showConfirmDialog(null,
                             "¿Eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
                         if (ok == JOptionPane.YES_OPTION) {
-                            // Llama a gestionar(int) — método sobrecargado que elimina por posición
                             gestor.gestionar(row);
                             iconosPorFila.remove(row);
                             refrescarVista();
                             JOptionPane.showMessageDialog(null, "Prenda eliminada correctamente.");
                         }
-=======
-                int x = e.getX() - tablaGestion.getCellRect(row, col, true).x;
-                if (x < 80) {
-                    // EDITAR: leer datos de la lógica y abrir formulario
-                    Prenda p = gestor.getPrendas().get(row);
-                    mostrarFormularioEditar(row, p.getNombre(),
-                        String.valueOf(p.getPrecio()),
-                        String.valueOf(p.getStock()),
-                        p.getCodigo(),
-                        p.getCategoria(), null, null, null, null);
-                } else {
-                    // ELIMINAR: confirmar, delegar a lógica y refrescar
-                    int ok = JOptionPane.showConfirmDialog(null,
-                        "¿Eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
-                    if (ok == JOptionPane.YES_OPTION) {
-                        // Llama a gestionar(int) — método sobrecargado que elimina por posición
-                        gestor.gestionar(row);
-                        iconosPorFila.remove(row);
-                        refrescarVista();
-                        JOptionPane.showMessageDialog(null, "Se eliminó de la tabla y del catálogo.");
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
                     }
                 } else if (col == 7) {
                     // VER DETALLES: abrir ventana con info completa de la prenda
@@ -600,22 +484,8 @@ public class GestorAdministrativo extends JFrame {
                 return;
             }
 
-<<<<<<< HEAD
             // Agrega la prenda sin variantes — el stock se generará por entradas de mercadería
             gestor.gestionar(codigo, nombre, Double.parseDouble(precio), categoria, new java.util.ArrayList<>());
-=======
-            // Leer las variantes que el usuario llenó en el panel
-            List<Variante> variantes = leerVariantesDelPanel(panelVariantes);
-            // Delegar validación de variantes a la lógica
-            String resVariantes = gestor.validarVariantes(variantes);
-            if (!resVariantes.equals("OK")) {
-                JOptionPane.showMessageDialog(dialog, resVariantes);
-                return;
-            }
-
-            // Llama a gestionar(String, String, double, String, List) — método sobrecargado que agrega la prenda
-            gestor.gestionar(codigo, nombre, Double.parseDouble(precio), categoria, variantes);
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
 
             // Guardar iconos para esta prenda
             int nuevaFila = gestor.getPrendas().size() - 1;
@@ -793,116 +663,6 @@ public class GestorAdministrativo extends JFrame {
                 p.getCategoria(), "", ""
             });
         }
-<<<<<<< HEAD
-=======
-
-        gridPanel.revalidate();
-        gridPanel.repaint();
-    }
-
-    // ─────────────────────────────────────────
-    // TARJETA DEL CATÁLOGO
-    // ─────────────────────────────────────────
-
-    /**
-     * Crea una tarjeta visual para el catálogo.
-     * Recibe el objeto Prenda directamente desde la lógica, no strings sueltos.
-     */
-    private JPanel crearTarjeta(Prenda prenda, int fila, ImageIcon iconTarjeta) {
-        return crearTarjeta(prenda.getNombre(), String.valueOf(prenda.getPrecio()),
-                            prenda.getCodigo(), String.valueOf(prenda.getStock()),
-                            iconTarjeta, fila);
-    }
-
-    /** Construye visualmente la tarjeta con los datos recibidos */
-    private JPanel crearTarjeta(String nombre, String precio, String codigo,
-                                String stock, ImageIcon iconTarjeta, int filaTabla) {
-        JPanel card = new JPanel(null);
-        card.setBackground(Color.WHITE);
-        card.setBorder(new LineBorder(new Color(220, 220, 220), 1, true));
-        card.setPreferredSize(new Dimension(185, 235));
-
-        // Imagen de la prenda (ya viene escalada desde iconosPorFila)
-        JLabel imgLabel = new JLabel("", SwingConstants.CENTER);
-        imgLabel.setBackground(new Color(230, 230, 230));
-        imgLabel.setOpaque(true);
-        if (iconTarjeta != null)
-            imgLabel.setIcon(iconTarjeta);
-        imgLabel.setBounds(1, 1, 183, 140);
-        card.add(imgLabel);
-
-        JLabel lblNombre = new JLabel(nombre, SwingConstants.CENTER);
-        lblNombre.setFont(new Font("Arial", Font.BOLD, 12));
-        lblNombre.setBounds(5, 145, 175, 18);
-        card.add(lblNombre);
-
-        JLabel lblPrecio = new JLabel("S/. " + precio, SwingConstants.CENTER);
-        lblPrecio.setFont(new Font("Arial", Font.PLAIN, 11));
-        lblPrecio.setForeground(new Color(80, 80, 80));
-        lblPrecio.setBounds(5, 163, 175, 16);
-        card.add(lblPrecio);
-
-        JLabel lblInfo = new JLabel("ID: " + codigo + "   Stock: " + stock, SwingConstants.CENTER);
-        lblInfo.setFont(new Font("Arial", Font.PLAIN, 10));
-        lblInfo.setForeground(new Color(130, 130, 130));
-        lblInfo.setBounds(5, 179, 175, 14);
-        card.add(lblInfo);
-
-        JButton btnEditar = new JButton("EDITAR");
-        btnEditar.setFont(new Font("Arial", Font.BOLD, 10));
-        btnEditar.setBackground(new Color(100, 160, 220));
-        btnEditar.setForeground(Color.WHITE);
-        btnEditar.setBorderPainted(false);
-        btnEditar.setFocusPainted(false);
-        btnEditar.setOpaque(true);
-        btnEditar.setBounds(5, 200, 82, 24);
-        card.add(btnEditar);
-
-        JButton btnEliminar = new JButton("ELIMINAR");
-        btnEliminar.setFont(new Font("Arial", Font.BOLD, 10));
-        btnEliminar.setBackground(new Color(220, 100, 100));
-        btnEliminar.setForeground(Color.WHITE);
-        btnEliminar.setBorderPainted(false);
-        btnEliminar.setFocusPainted(false);
-        btnEliminar.setOpaque(true);
-        btnEliminar.setBounds(95, 200, 85, 24);
-        card.add(btnEliminar);
-
-        // Eliminar: confirmar, delegar a lógica y refrescar
-        btnEliminar.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(card,
-                "¿Deseas eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                int idx = gridPanel.getComponentZOrder(card);
-                // Llama a gestionar(int) — método sobrecargado que elimina por posición
-                gestor.gestionar(idx);
-                iconosPorFila.remove(idx);
-                refrescarVista();
-                JOptionPane.showMessageDialog(null, "Se eliminó de la tabla y del catálogo.");
-            }
-        });
-
-        // Editar: leer datos de la lógica y abrir formulario
-        btnEditar.addActionListener(e -> {
-            int fila = gridPanel.getComponentZOrder(card);
-            Prenda p = gestor.getPrendas().get(fila);
-            mostrarFormularioEditar(fila,
-                p.getNombre(), String.valueOf(p.getPrecio()),
-                String.valueOf(p.getStock()), p.getCodigo(), p.getCategoria(),
-                null, null, null, null);
-        });
-
-        // Clic en la tarjeta (no en los botones) abre los detalles
-        card.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                int fila = gridPanel.getComponentZOrder(card);
-                Prenda p = gestor.getPrendas().get(fila);
-                verDetallesPrenda(p);
-            }
-        });
-
-        return card;
->>>>>>> bb1c1d979ec4fa860ed65bcc4568d4dbef3145f1
     }
 
     // ─────────────────────────────────────────
