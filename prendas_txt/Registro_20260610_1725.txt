@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : 1
+Descripción      : JEANS BABY
+Precio Unitario  : S/. 123.0
+Categoría Ropa   : PANTALONES & JEANS
+Ruta de Imagen   : C:\Users\HP\Downloads\ROPA\AAAAA.jpg
+=========================================
+

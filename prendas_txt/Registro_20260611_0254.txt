@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : 3
+Descripción      : POLO
+Precio Unitario  : S/. 89.0
+Categoría Ropa   : POLOS
+Ruta de Imagen   : imagenes/polito4.jpg
+=========================================
+

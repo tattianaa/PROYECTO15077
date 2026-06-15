@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : 1
+Descripción      : CASACA
+Precio Unitario  : S/. 123.0
+Categoría Ropa   : CASACAS
+Ruta de Imagen   : imagenes/casaca6.jpg
+=========================================
+

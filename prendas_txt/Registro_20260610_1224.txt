@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : asd456
+Descripción      : jeans
+Precio Unitario  : S/. 12.0
+Categoría Ropa   : PANTALONES & JEANS
+Ruta de Imagen   : 
+=========================================
+

@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : 1
+Descripción      : v
+Precio Unitario  : S/. 127.0
+Categoría Ropa   : PANTALONES & JEANS
+Ruta de Imagen   : imagenes/vestido3.jpg
+=========================================
+

@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <libraryInfos>
-<<<<<<< HEAD
-    <libraryInfo home="C:\Users\Aramis\Desktop\EJERCICIOS\1\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638\jre" version="21.0.10"/>
-    <libraryInfo home="C:\Users\Aramis\Desktop\EJERCICIOS\1\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638" version="21.0.10">
-=======
     <libraryInfo home="C:\TECPRO 5TO CICLO\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638\jre" version="21.0.10"/>
-    <libraryInfo home="C:\Users\Sebastián Salas\OneDrive\Escritorio\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638\jre" version="21.0.10"/>
     <libraryInfo home="C:\Program Files\Java\jre1.8.0_51" version="1.8.0_51">
         <bootpath>
             <entry path="C:\Program Files\Java\jre1.8.0_51\lib\resources.jar"/>
@@ -23,49 +18,6 @@
         </extensionDirs>
         <endorsedDirs>
             <entry path="C:\Program Files\Java\jre1.8.0_51\lib\endorsed"/>
-        </endorsedDirs>
-    </libraryInfo>
-    <libraryInfo home="C:\Users\Sebastián Salas\OneDrive\Escritorio\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638" version="21.0.10">
->>>>>>> 959619b29d158756f9341495ed0b02fea47ab88e
-        <bootpath>
-            <entry path="null"/>
-        </bootpath>
-        <extensionDirs>
-            <entry path="null"/>
-        </extensionDirs>
-        <endorsedDirs>
-            <entry path="null"/>
-        </endorsedDirs>
-    </libraryInfo>
-<<<<<<< HEAD
-    <libraryInfo home="C:\Program Files\BellSoft\LibericaJDK-21-Full" version="21.0.5"/>
-    <libraryInfo home="C:\Program Files\Java\jre1.8.0_431" version="1.8.0_431">
-        <bootpath>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\resources.jar"/>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\rt.jar"/>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\jsse.jar"/>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\jce.jar"/>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\charsets.jar"/>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\jfr.jar"/>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\classes"/>
-        </bootpath>
-        <extensionDirs>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\ext"/>
-            <entry path="C:\WINDOWS\Sun\Java\lib\ext"/>
-        </extensionDirs>
-        <endorsedDirs>
-            <entry path="C:\Program Files\Java\jre1.8.0_431\lib\endorsed"/>
-=======
-    <libraryInfo home="C:\TECPRO 5TO CICLO\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638" version="21.0.10">
-        <bootpath>
-            <entry path="null"/>
-        </bootpath>
-        <extensionDirs>
-            <entry path="null"/>
-        </extensionDirs>
-        <endorsedDirs>
-            <entry path="null"/>
->>>>>>> 959619b29d158756f9341495ed0b02fea47ab88e
         </endorsedDirs>
     </libraryInfo>
 </libraryInfos>

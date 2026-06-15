@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : ASD-876
+Descripción      : FALDA
+Precio Unitario  : S/. 156.0
+Categoría Ropa   : FALDAS & SHORTS
+Ruta de Imagen   : C:\Users\HP\Downloads\ROPA\ROPA
+=========================================
+

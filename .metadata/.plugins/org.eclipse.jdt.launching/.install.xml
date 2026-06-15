@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dirs>
-<<<<<<< HEAD
-    <entry loc="C:\Users\Aramis\Desktop\EJERCICIOS\1\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638\jre" stamp="1772722730000"/>
-    <entry loc="C:\Users\Aramis\Desktop\EJERCICIOS\1\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638" stamp="1772722730000"/>
-    <entry loc="C:\Program Files\BellSoft\LibericaJDK-21-Full" stamp="1730603193715"/>
-    <entry loc="C:\Program Files\Java\jre1.8.0_431" stamp="1730248364244"/>
-=======
     <entry loc="C:\TECPRO 5TO CICLO\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638\jre" stamp="1772722730000"/>
-    <entry loc="C:\Users\Sebastián Salas\OneDrive\Escritorio\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638\jre" stamp="1772722730000"/>
     <entry loc="C:\Program Files\Java\jre1.8.0_51" stamp="1630353539133"/>
-    <entry loc="C:\Users\Sebastián Salas\OneDrive\Escritorio\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638" stamp="1772722730000"/>
-    <entry loc="C:\TECPRO 5TO CICLO\eclipse\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.10.v20260205-0638" stamp="1772722730000"/>
->>>>>>> 959619b29d158756f9341495ed0b02fea47ab88e
 </dirs>

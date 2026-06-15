@@ -25,7 +25,7 @@ public class ProveedorLogica {
     // ─────────────────────────────────────────
 
     // Recibe un String (código) → busca el proveedor y retorna su posición, o -1 si no existe
-    public int gestionar(String codigo) {
+    public int Gestionproveedor(String codigo) {
         for (int i = 0; i < proveedores.size(); i++) {
             if (proveedores.get(i).getCodigo().equals(codigo)) {
                 return i;
@@ -33,9 +33,18 @@ public class ProveedorLogica {
         }
         return -1;
     }
+ // Recibe un int (posición) → elimina el proveedor en esa posición de la lista
+    public boolean Gestionproveedor(int fila) {
+        if (fila >= 0 && fila < proveedores.size()) {
+            proveedores.remove(fila);
+            return true;
+        }
+        return false;
+    }
+
 
     // Recibe todos los datos → agrega un proveedor nuevo a la lista
-    public void gestionar(String codigo, String nombre, String ruc, String telefono) {
+    public void Gestionproveedor(String codigo, String nombre, String ruc, String telefono) {
         Proveedor p = new Proveedor(codigo, nombre, ruc, telefono);
         proveedores.add(p);
     }
@@ -44,36 +53,7 @@ public class ProveedorLogica {
     // OTROS MÉTODOS
     // ─────────────────────────────────────────
 
-    // Valida los datos del formulario antes de guardar
-    public String validar(String codigo, String nombre, String ruc, String telefono) {
-
-        // Código: formato ABC123 (3 letras + 3 números)
-        if (!codigo.matches("[A-Z]{3}[0-9]{3}")) {
-            return "El código debe tener el formato ABC123 (3 letras y 3 números).";
-        }
-
-        // Código duplicado
-        if (gestionar(codigo) != -1) {
-            return "Ese código de proveedor ya existe.";
-        }
-
-        // Nombre: solo letras y espacios
-        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
-            return "El nombre solo debe contener letras.";
-        }
-
-        // RUC: exactamente 11 dígitos
-        if (!ruc.matches("\\d{11}")) {
-            return "El RUC debe tener exactamente 11 dígitos numéricos.";
-        }
-
-        // Teléfono: exactamente 9 dígitos
-        if (!telefono.matches("\\d{9}")) {
-            return "El teléfono debe tener exactamente 9 dígitos numéricos.";
-        }
-
-        return "OK";
-    }
+    
 
     // Devuelve lista de proveedores en formato "CODIGO - Nombre" para mostrar en combo
     public List<String> getProveedoresFormato() {
@@ -82,5 +62,10 @@ public class ProveedorLogica {
             lista.add(p.getCodigo() + " - " + p.getNombre());
         }
         return lista;
+    }
+
+    // Limpia la lista en memoria
+    public void limpiar() {
+        proveedores.clear();
     }
 }

@@ -13,13 +13,21 @@ import logica.ProveedorLogica;
 // Recibe las instancias de lógica desde GestorAdministrativo para leer proveedores y prendas
 public class GestorEntradas extends JPanel {
 
-    // Referencias a la lógica para recargar combos cuando el panel se hace visible
-    private InventarioLogica inventario;
-    private ProveedorLogica proveedores;
 
-    public GestorEntradas(InventarioLogica inventario, ProveedorLogica proveedores) {
-        this.inventario  = inventario;
+    private ProveedorLogica proveedores;
+ // Lógica de entradas — recibida desde GestorAdministrativo para guardar el historial
+    private logica.EntradaLogica entradas;
+    
+    private DefaultTableModel modeloEntradas;
+
+
+
+    public GestorEntradas(InventarioLogica inventario, ProveedorLogica proveedores, logica.EntradaLogica entradas) {
+       
         this.proveedores = proveedores;
+        this.entradas=entradas;
+        
+        
         setLayout(null);
         setBackground(new Color(245, 242, 225));
 
@@ -65,15 +73,6 @@ public class GestorEntradas extends JPanel {
         JComboBox<String> comboTalla = new JComboBox<>(tallas);
         comboTalla.setBounds(365, 35, 80, 30);
         formPanel.add(comboTalla);
-
-        // Campo: color de la prenda
-        JLabel lColor = new JLabel("Color:");
-        lColor.setFont(new Font("Arial", Font.PLAIN, 12));
-        lColor.setBounds(460, 15, 60, 20);
-        formPanel.add(lColor);
-        JTextField txtColor = new JTextField();
-        txtColor.setBounds(460, 35, 90, 30);
-        formPanel.add(txtColor);
 
         // Campo: cantidad de unidades que ingresaron
         JLabel lCantidad = new JLabel("Cantidad:");
@@ -127,8 +126,8 @@ public class GestorEntradas extends JPanel {
         add(lblHistorial);
 
         // Tabla que muestra todas las entradas registradas
-        String[] columnas = {"Proveedor", "Prenda", "Talla", "Color", "Cantidad", "Fecha"};
-        DefaultTableModel modeloEntradas = new DefaultTableModel(columnas, 0) {
+        String[] columnas = {"Proveedor", "Prenda", "Talla", "Cantidad", "Fecha"};
+        modeloEntradas = new DefaultTableModel(columnas, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
@@ -157,21 +156,23 @@ public class GestorEntradas extends JPanel {
                 comboPrenda.removeAllItems();
                 comboPrenda.addItem("-- Seleccionar --");
                 for (String s : inventario.getPrendasFormato()) comboPrenda.addItem(s);
+                cargarEntradasDesdeDB();
             }
+            
+
         });
+        
 
         // Limpiar campos editables — los combos vuelven a "-- Seleccionar --"
         btnLimpiar.addActionListener(e -> {
             comboProveedor.setSelectedIndex(0);
             comboPrenda.setSelectedIndex(0);
             comboTalla.setSelectedIndex(0);
-            txtColor.setText("");
             txtCantidad.setText("");
         });
 
         // Validar y registrar la entrada al presionar el botón
         btnRegistrar.addActionListener(e -> {
-            // Leer proveedor seleccionado — extraer solo el código
             String proveedorSeleccionado = (String) comboProveedor.getSelectedItem();
             if (proveedorSeleccionado.equals("-- Seleccionar --")) {
                 JOptionPane.showMessageDialog(this, "Selecciona un proveedor.");
@@ -179,7 +180,6 @@ public class GestorEntradas extends JPanel {
             }
             String codigoProveedor = proveedorSeleccionado.split(" - ")[0];
 
-            // Leer prenda seleccionada — extraer solo el código
             String prendaSeleccionada = (String) comboPrenda.getSelectedItem();
             if (prendaSeleccionada.equals("-- Seleccionar --")) {
                 JOptionPane.showMessageDialog(this, "Selecciona una prenda.");
@@ -188,17 +188,14 @@ public class GestorEntradas extends JPanel {
             String codigoPrenda = prendaSeleccionada.split(" - ")[0];
 
             String talla    = (String) comboTalla.getSelectedItem();
-            String color    = txtColor.getText().trim();
             String cantidad = txtCantidad.getText().trim();
             String fecha    = txtFecha.getText().trim();
 
-            // Verificar que color y cantidad no estén vacíos
-            if (color.isEmpty() || cantidad.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Color y cantidad son obligatorios.");
+            if (cantidad.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Campo obligatorio. Vuelva a intentarlo");
                 return;
             }
 
-            // Verificar que la cantidad sea un número entero mayor a 0
             int cant;
             try {
                 cant = Integer.parseInt(cantidad);
@@ -208,13 +205,33 @@ public class GestorEntradas extends JPanel {
                 return;
             }
 
-            // TODO: conectar con EntradaLogica y actualizar stock cuando se implemente
-            // Por ahora solo agrega la fila a la tabla visual
-            modeloEntradas.addRow(new Object[]{codigoProveedor, codigoPrenda, talla, color, cant, fecha});
-            JOptionPane.showMessageDialog(this, "Entrada registrada correctamente.");
+            modelo.EntradaInventario entrada = new modelo.EntradaInventario(codigoProveedor, codigoPrenda, talla, cant, fecha);
+            boolean ok = dao.EntradasDAO.insertar(entrada);
+            if (!ok) return;
+            dao.PrendaDAO.actualizarStock(codigoPrenda, talla, cant);
+            entradas.registrarEntrada(codigoProveedor, codigoPrenda, talla, cant, fecha);
 
-            // Limpiar el formulario después de registrar
+          
+
+
+            // Agrega la fila a la tabla visual
+            modeloEntradas.addRow(new Object[]{codigoProveedor, codigoPrenda, talla, cant, fecha});
+
+            JOptionPane.showMessageDialog(this, "Entrada registrada correctamente.");
             btnLimpiar.doClick();
         });
     }
+    private void cargarEntradasDesdeDB() {
+        modeloEntradas.setRowCount(0);
+        for (modelo.EntradaInventario e : dao.EntradasDAO.listar()) {
+            modeloEntradas.addRow(new Object[]{
+                e.getCodigoProveedor(),
+                e.getCodigoPrenda(),
+                e.getTalla(),
+                e.getCantidad(),
+                e.getFecha()
+            });
+        }
+    }
+
 }

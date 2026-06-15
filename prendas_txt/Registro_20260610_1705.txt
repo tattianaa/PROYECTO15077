@@ -1,0 +1,20 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : 1
+Descripción      : jeans
+Precio Unitario  : S/. 123.0
+Categoría Ropa   : PANTALONES & JEANS
+Ruta de Imagen   : 
+=========================================
+
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : 4
+Descripción      : jeans
+Precio Unitario  : S/. 123.0
+Categoría Ropa   : PANTALONES & JEANS
+Ruta de Imagen   : 
+=========================================
+

@@ -1,2 +1,3 @@
-2026/04/26-16:40:44.522 2b64 Creating DB C:\Users\Aramis\Desktop\ProyectoFinal\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb since it was missing.
-2026/04/26-16:40:44.582 2b64 Reusing MANIFEST C:\Users\Aramis\Desktop\ProyectoFinal\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
+2026/06/13-19:52:37.512 2d20 Reusing MANIFEST C:\Users\HP\Desktop\PROYECTOFINAL_TEEPROG5\ProyectoFinal_G5\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
+2026/06/13-19:52:37.553 2d20 Recovering log #3
+2026/06/13-19:52:37.559 2d20 Reusing old log C:\Users\HP\Desktop\PROYECTOFINAL_TEEPROG5\ProyectoFinal_G5\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/000003.log 

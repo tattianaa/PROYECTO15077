@@ -1,160 +1,222 @@
 package gui;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.Color;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import java.awt.Font;
+import Formularios.FormNuevoProveedor;
 import logica.ProveedorLogica;
-import modelo.Proveedor;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
-// Pantalla para gestionar proveedores
 public class GestorProveedores extends JPanel {
 
-    // Tabla donde se muestran los proveedores registrados
+    private static final long serialVersionUID = 1L;
+
+    // ── Componentes visuales ──
+    private JTextField txtBuscar;
+    private JTable table;
+    private JButton btnBuscar;
+    private JButton btnNuevoProveedor;
+    private JButton btnEditar;
+    private JButton btnEliminar;
+    private JScrollPane scrollPane;
+
+    // ── Lógica y modelo ──
+    private ProveedorLogica gestor;
     private DefaultTableModel modeloTabla;
 
-    // Objeto de lógica recibido desde GestorAdministrativo — lista compartida
-    private ProveedorLogica gestor;
-
+    // ── Constructor: solo diseño visual ──
     public GestorProveedores(ProveedorLogica gestor) {
         this.gestor = gestor;
-        setLayout(null);
+
         setBackground(new Color(245, 242, 225));
+        setLayout(null);
 
         // Título
         JLabel lblTitulo = new JLabel("Gestión de Proveedores");
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 18));
-        lblTitulo.setBounds(20, 15, 300, 30);
+        lblTitulo.setForeground(new Color(0, 64, 128));
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 17));
+        lblTitulo.setBounds(10, 27, 232, 14);
         add(lblTitulo);
 
-        // Botón para abrir el formulario de nuevo proveedor
-        JButton btnNuevo = new JButton("+ NUEVO PROVEEDOR");
-        btnNuevo.setFont(new Font("Arial", Font.BOLD, 13));
-        btnNuevo.setBackground(new Color(130, 190, 140));
-        btnNuevo.setForeground(Color.WHITE);
-        btnNuevo.setBorderPainted(false);
-        btnNuevo.setFocusPainted(false);
-        btnNuevo.setOpaque(true);
-        btnNuevo.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnNuevo.setBounds(580, 15, 190, 36);
-        add(btnNuevo);
+        // Campo buscar
+        txtBuscar = new JTextField();
+        txtBuscar.setForeground(new Color(125, 125, 125));
+        txtBuscar.setText("Ingresa código o nombre del proveedor..");
+        txtBuscar.setBounds(10, 52, 232, 32);
+        add(txtBuscar);
 
-        // Tabla que muestra los proveedores registrados
-        String[] columnas = {"Código", "Nombre", "RUC", "Teléfono"};
-        modeloTabla = new DefaultTableModel(columnas, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
+        // Botón buscar
+        btnBuscar = new JButton("BUSCAR");
+        btnBuscar.setBorderPainted(false);
+        btnBuscar.setFocusPainted(false);
+        btnBuscar.setForeground(new Color(50, 50, 50));
+        btnBuscar.setBackground(new Color(220, 190, 195));
+        btnBuscar.setBounds(252, 52, 98, 32);
+        add(btnBuscar);
+
+        // Botón nuevo proveedor
+        btnNuevoProveedor = new JButton("+ Nuevo Proveedor");
+        btnNuevoProveedor.setBorderPainted(false);
+        btnNuevoProveedor.setFocusPainted(false);
+        btnNuevoProveedor.setForeground(Color.WHITE);
+        btnNuevoProveedor.setBackground(new Color(130, 190, 140));
+        btnNuevoProveedor.setBounds(360, 50, 196, 36);
+        add(btnNuevoProveedor);
+
+        // Tabla
+        modeloTabla = new DefaultTableModel(
+            new Object[][]{},
+            new String[]{"CÓDIGO", "NOMBRE", "RUC", "TELÉFONO"}
+        ) {
+            public boolean isCellEditable(int row, int col) { return false; }
         };
 
-        JTable tabla = new JTable(modeloTabla);
-        tabla.setRowHeight(30);
-        tabla.setFont(new Font("Arial", Font.PLAIN, 12));
-        tabla.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
-        tabla.getTableHeader().setBackground(new Color(240, 235, 225));
-        tabla.setBackground(Color.WHITE);
-        tabla.setGridColor(new Color(220, 220, 220));
-        tabla.setSelectionBackground(new Color(220, 190, 195));
+        table = new JTable(modeloTabla);
+        table.setRowHeight(35);
+        table.getColumnModel().getColumn(0).setPreferredWidth(80);
+        table.getColumnModel().getColumn(1).setPreferredWidth(200);
+        table.getColumnModel().getColumn(2).setPreferredWidth(110);
+        table.getColumnModel().getColumn(3).setPreferredWidth(100);
 
-        JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBounds(20, 65, 750, 500);
-        scroll.setBorder(new LineBorder(new Color(220, 220, 220)));
-        add(scroll);
+        scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(10, 103, 557, 249);
+        add(scrollPane);
 
-        btnNuevo.addActionListener(e -> abrirFormulario());
+        // Botón editar
+        btnEditar = new JButton("Editar");
+        btnEditar.setBackground(new Color(220, 190, 195));
+        btnEditar.setBorderPainted(false);
+        btnEditar.setBounds(577, 105, 126, 32);
+        add(btnEditar);
+
+        // Botón eliminar
+        btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBorderPainted(false);
+        btnEliminar.setBackground(new Color(180, 180, 185));
+        btnEliminar.setBounds(577, 148, 126, 32);
+        add(btnEliminar);
+
+        // Cargar datos y eventos
+        cargarProveedoresDesdeDB();
+        agregarEventos();
     }
 
-    // Abre el formulario para registrar un nuevo proveedor
-    private void abrirFormulario() {
-        JFrame ventanaPadre = (JFrame) SwingUtilities.getWindowAncestor(this);
-        JDialog dlg = new JDialog(ventanaPadre, "Nuevo Proveedor", true);
-        dlg.setSize(400, 380);
-        dlg.setLocationRelativeTo(ventanaPadre);
-        dlg.setResizable(false);
+  
+    private void agregarEventos() {
 
-        JPanel panel = new JPanel(null);
-        panel.setBackground(Color.WHITE);
-        dlg.setContentPane(panel);
-
-        JLabel lCodigo = new JLabel("Código (ej: PRV001):");
-        lCodigo.setBounds(20, 20, 180, 20);
-        panel.add(lCodigo);
-        JTextField txtCodigo = new JTextField();
-        txtCodigo.setBounds(20, 42, 350, 30);
-        panel.add(txtCodigo);
-
-        JLabel lNombre = new JLabel("Nombre:");
-        lNombre.setBounds(20, 80, 180, 20);
-        panel.add(lNombre);
-        JTextField txtNombre = new JTextField();
-        txtNombre.setBounds(20, 102, 350, 30);
-        panel.add(txtNombre);
-
-        JLabel lRuc = new JLabel("RUC (11 dígitos):");
-        lRuc.setBounds(20, 140, 180, 20);
-        panel.add(lRuc);
-        JTextField txtRuc = new JTextField();
-        txtRuc.setBounds(20, 162, 350, 30);
-        panel.add(txtRuc);
-
-        JLabel lTelefono = new JLabel("Teléfono:");
-        lTelefono.setBounds(20, 200, 180, 20);
-        panel.add(lTelefono);
-        JTextField txtTelefono = new JTextField();
-        txtTelefono.setBounds(20, 222, 350, 30);
-        panel.add(txtTelefono);
-
-        JButton btnGuardar = new JButton("GUARDAR");
-        btnGuardar.setBackground(new Color(130, 190, 140));
-        btnGuardar.setForeground(Color.WHITE);
-        btnGuardar.setBorderPainted(false);
-        btnGuardar.setFocusPainted(false);
-        btnGuardar.setOpaque(true);
-        btnGuardar.setBounds(20, 265, 160, 36);
-        panel.add(btnGuardar);
-
-        JButton btnCancelar = new JButton("CANCELAR");
-        btnCancelar.setBackground(new Color(220, 100, 100));
-        btnCancelar.setForeground(Color.WHITE);
-        btnCancelar.setBorderPainted(false);
-        btnCancelar.setFocusPainted(false);
-        btnCancelar.setOpaque(true);
-        btnCancelar.setBounds(210, 265, 160, 36);
-        panel.add(btnCancelar);
-
-        btnCancelar.addActionListener(e -> dlg.dispose());
-
-        btnGuardar.addActionListener(e -> {
-            // Leer campos y quitar espacios
-            String codigo   = txtCodigo.getText().trim().toUpperCase();
-            String nombre   = txtNombre.getText().trim();
-            String ruc      = txtRuc.getText().trim();
-            String telefono = txtTelefono.getText().trim();
-
-            // Verificar que ningún campo esté vacío
-            if (codigo.isEmpty() || nombre.isEmpty() || ruc.isEmpty() || telefono.isEmpty()) {
-                JOptionPane.showMessageDialog(dlg, "Todos los campos son obligatorios.");
-                return;
+        // Placeholder del campo buscar
+        txtBuscar.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (txtBuscar.getText().equals("Ingresa código o nombre del proveedor..")) {
+                    txtBuscar.setText("");
+                    txtBuscar.setForeground(new Color(0, 0, 0));
+                }
             }
-
-            // Validar formato con la lógica
-            String resultado = gestor.validar(codigo, nombre, ruc, telefono);
-            if (!resultado.equals("OK")) {
-                JOptionPane.showMessageDialog(dlg, resultado);
-                return;
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (txtBuscar.getText().isEmpty()) {
+                    txtBuscar.setText("Ingresa código o nombre del proveedor..");
+                    txtBuscar.setForeground(new Color(125, 125, 125));
+                }
             }
-
-            // Guardar el proveedor usando el método sobrecargado gestionar
-            gestor.gestionar(codigo, nombre, ruc, telefono);
-
-            // Recargar la tabla desde la lista actualizada
-            modeloTabla.setRowCount(0);
-            for (Proveedor p : gestor.getProveedores()) {
-                modeloTabla.addRow(new Object[]{p.getCodigo(), p.getNombre(), p.getRuc(), p.getTelefono()});
-            }
-
-            JOptionPane.showMessageDialog(dlg, "Proveedor registrado correctamente.");
-            dlg.dispose();
         });
 
-        dlg.setVisible(true);
+        // Botón BUSCAR
+        btnBuscar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String texto = txtBuscar.getText().trim().toLowerCase();
+                modeloTabla.setRowCount(0);
+                boolean hayResultados = false;
+                for (modelo.Proveedor p : gestor.getProveedores()) {
+                    if (texto.isEmpty()
+                        || texto.equals("ingresa código o nombre del proveedor..")
+                        || p.getNombre().toLowerCase().contains(texto)
+                        || p.getCodigo().toLowerCase().contains(texto)) {
+                        modeloTabla.addRow(new Object[]{
+                            p.getCodigo(), p.getNombre(), p.getRuc(), p.getTelefono()
+                        });
+                        hayResultados = true;
+                    }
+                }
+                if (!hayResultados)
+                    JOptionPane.showMessageDialog(null, "No se encontraron proveedores.");
+                txtBuscar.setText("");
+                txtBuscar.requestFocus();
+            }
+        });
+
+        // Botón NUEVO PROVEEDOR
+        btnNuevoProveedor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Recarga la lista antes de abrir para que las validaciones funcionen
+                cargarProveedoresDesdeDB();
+                FormNuevoProveedor form = new FormNuevoProveedor(modeloTabla, gestor);
+                form.setLocationRelativeTo(null);
+                form.setVisible(true);
+            }
+        });
+
+        // Botón EDITAR
+        btnEditar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int fila = table.getSelectedRow();
+                if (fila == -1) {
+                    JOptionPane.showMessageDialog(null, "Selecciona un proveedor para editar.");
+                    return;
+                }
+                JOptionPane.showMessageDialog(null, "Editar: " + modeloTabla.getValueAt(fila, 1));
+            }
+        });
+
+        // Botón ELIMINAR
+        btnEliminar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int fila = table.getSelectedRow();
+                if (fila == -1) {
+                    JOptionPane.showMessageDialog(null, "Selecciona un proveedor para eliminar.");
+                    return;
+                }
+                int confirm = JOptionPane.showConfirmDialog(null,
+                    "¿Eliminar este proveedor?", "Confirmar", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    String codigo = (String) modeloTabla.getValueAt(fila, 0);
+                    boolean ok = dao.ProveedorDAO.eliminar(codigo);
+                    if (ok) {
+                        gestor.Gestionproveedor(fila);
+                        modeloTabla.removeRow(fila);
+                        JOptionPane.showMessageDialog(null, "Proveedor eliminado.");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se pudo eliminar de la base de datos.");
+                    }
+                }
+            }
+        });
+
+        // Recarga al hacerse visible
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                cargarProveedoresDesdeDB();
+            }
+        });
+    }
+
+    // ── Carga proveedores desde MySQL ──
+    private void cargarProveedoresDesdeDB() {
+        modeloTabla.setRowCount(0);
+        // Limpia la lista en memoria antes de recargar para evitar duplicados
+        gestor.limpiar();
+        for (modelo.Proveedor p : dao.ProveedorDAO.listar()) {
+            gestor.Gestionproveedor(p.getCodigo(), p.getNombre(), p.getRuc(), p.getTelefono());
+            modeloTabla.addRow(new Object[]{
+                p.getCodigo(), p.getNombre(), p.getRuc(), p.getTelefono()
+            });
+        }
     }
 }

@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : AGH666
+Descripción      : POLERA
+Precio Unitario  : S/. 123.0
+Categoría Ropa   : POLERAS
+Ruta de Imagen   : imagenes/casaca3.jpg
+=========================================
+

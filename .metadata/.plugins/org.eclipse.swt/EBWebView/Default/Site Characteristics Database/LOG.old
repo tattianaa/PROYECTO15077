@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-2026/04/26-16:40:44.341 4d54 Creating DB C:\Users\Aramis\Desktop\ProyectoFinal\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database since it was missing.
-2026/04/26-16:40:44.356 4d54 Reusing MANIFEST C:\Users\Aramis\Desktop\ProyectoFinal\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/MANIFEST-000001
-=======
-2026/04/19-20:11:49.663 928 Log #3: 2 ops saved to Table #4 OK
-2026/04/19-20:11:49.669 928 Archiving C:\Users\HP\Desktop\PROYECTOFINAL_TEEPROG5\ProyectoFinal_G5\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/000003.log: OK
-2026/04/19-20:11:49.670 928 Table #4: 2 entries OK
-2026/04/19-20:11:49.673 928 Archiving C:\Users\HP\Desktop\PROYECTOFINAL_TEEPROG5\ProyectoFinal_G5\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/MANIFEST-000001: OK
-2026/04/19-20:11:49.684 928 **** Repaired leveldb C:\Users\HP\Desktop\PROYECTOFINAL_TEEPROG5\ProyectoFinal_G5\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database; recovered 1 files; 191 bytes. Some data may have been lost. ****
->>>>>>> 959619b29d158756f9341495ed0b02fea47ab88e
+2026/06/13-19:52:37.103 2864 Reusing MANIFEST C:\Users\HP\Desktop\PROYECTOFINAL_TEEPROG5\ProyectoFinal_G5\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/MANIFEST-000001
+2026/06/13-19:52:37.107 2864 Recovering log #6
+2026/06/13-19:52:37.108 2864 Reusing old log C:\Users\HP\Desktop\PROYECTOFINAL_TEEPROG5\ProyectoFinal_G5\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/000006.log 

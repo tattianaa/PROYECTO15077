@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"version":1,"cache_data":[]}
-=======
-{"version":1,"cache_data":[{"file_hash":"27fdae52f0789549","server_context":"1;f94c025f-7523-6972-b613-ce2c246c55ce;unkn:100;0.01","result":1,"response_category":"Allowed","expiration_time":1776748310974239},{"file_hash":"107517f3989b8ccf","server_context":"1;f94c025f-7523-6972-b613-ce2c246c55ce;unkn:100;0.01","result":1,"response_category":"Allowed","expiration_time":1776748310973917}]}
->>>>>>> 959619b29d158756f9341495ed0b02fea47ab88e
+{"version":1,"cache_data":[{"file_hash":"29235fca8a0512d3","server_context":"1;f94c025f-7523-6972-b613-ce2c246c55ce;unkn:100;0.01","result":1,"response_category":"Allowed","expiration_time":1781489502585607}]}

@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : ASD455
+Descripción      : JEANS
+Precio Unitario  : S/. 123.0
+Categoría Ropa   : PANTALONES & JEANS
+Ruta de Imagen   : 
+=========================================
+

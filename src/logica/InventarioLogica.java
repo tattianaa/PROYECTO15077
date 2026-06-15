@@ -10,9 +10,9 @@ public class InventarioLogica {
     // Lista interna de prendas — por ahora en memoria, luego se conectará a base de datos
     private List<Prenda> listaPrendas = new ArrayList<>();
 
-    // Devuelve una copia de la lista de prendas
     public List<Prenda> getPrendas() {
-        return new ArrayList<>(listaPrendas);
+        return listaPrendas;
+    
     }
 
    
@@ -22,9 +22,9 @@ public class InventarioLogica {
  // Recibe todos los datos → agrega una prenda nueva con sus variantes a la lista
     public void gestionar(String codigo, String nombre, double precio,
                           String categoria, List<Variante> variantes) {
-        Prenda p = new Prenda(codigo, nombre, precio, categoria);
+    	Prenda p = new Prenda(codigo, nombre, precio, categoria, 0, "", 0, new java.util.ArrayList<>());
         for (Variante v : variantes) {
-            p.agregarVariante(v.getTalla(), v.getColor(), v.getStock());
+            p.agregarVariante(v.getTalla(), v.getStock());
         }
         listaPrendas.add(p);
     }
@@ -123,18 +123,12 @@ public class InventarioLogica {
             return "Ingresa al menos una variante con stock mayor a 0.";
         }
         for (Variante v : variantes) {
-            String color = v.getColor().trim();
-            if (color.isEmpty()) {
-                return "El color de la talla " + v.getTalla() + " no puede estar vacío.";
-            }
-            if (!color.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
-                return "El color '" + color + "' solo debe contener letras.";
-            }
+           
             if (v.getStock() == -1) {
                 return "El stock de la talla " + v.getTalla() + " debe ser un número entero.";
             }
             if (v.getStock() <= 0) {
-                return "El stock de " + v.getTalla() + " / " + color + " debe ser mayor a 0.";
+            	return "El stock de la talla " + v.getTalla() + " debe ser mayor a 0.";
             }
         }
         return "OK";
@@ -150,10 +144,15 @@ public class InventarioLogica {
         p.setNombre(nombre);
         p.setPrecio(Double.parseDouble(precio));
         p.setCategoria(categoria);
-        p.getVariantes().clear();
-        for (Variante v : variantes) {
-            p.agregarVariante(v.getTalla(), v.getColor(), v.getStock());
-        }
+     // Solo actualiza variantes si se pasó una lista no vacía
+     // Si viene vacía, mantiene las variantes actuales (el stock no se toca)
+     if (!variantes.isEmpty()) {
+         p.getVariantes().clear();
+         for (Variante v : variantes) {
+             p.agregarVariante(v.getTalla(), v.getStock());
+         }
+     }
+
         return true;
     }
 
@@ -164,6 +163,14 @@ public class InventarioLogica {
             lista.add(p.getCodigo() + " - " + p.getNombre());
         }
         return lista;
+    }
+    
+ // Limpia toda la lista de prendas en memoria
+    public void limpiar() {
+        listaPrendas.clear();
+    }
+    public void agregarPrenda(Prenda p) {
+        listaPrendas.add(p);
     }
 
 

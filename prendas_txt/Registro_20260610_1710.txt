@@ -1,0 +1,10 @@
+=========================================
+     REPORTE LOCAL - REGISTRO DE PRENDA   
+=========================================
+Código de Prenda : ASD123
+Descripción      : JEANS BABY
+Precio Unitario  : S/. 178.0
+Categoría Ropa   : PANTALONES & JEANS
+Ruta de Imagen   : C:\Users\HP\Downloads\ROPA\PT.jpg
+=========================================
+
