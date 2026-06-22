@@ -108,7 +108,7 @@ public class GestorProveedores extends JPanel {
         cargarProveedoresDesdeDB();
         agregarEventos();
     }
-
+    
   
     private void agregarEventos() {
 

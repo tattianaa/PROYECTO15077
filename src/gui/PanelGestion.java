@@ -20,35 +20,26 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import Formularios.FormNuevaPrenda;
+
 public class PanelGestion extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField txtBuscar;
 	private JTable tabladeGestión;
-	
-	
-	// Antes creaba su propia lista de prendas — ahora la recibe desde GestorAdministrativo
-	// Así PanelGestion y GestorEntradas comparten la misma lista
+	private JComboBox<String> cboCategoria;
 	private InventarioLogica gestor;
-
-	// Lógica de entradas — recibida desde GestorAdministrativo
-	// Se pasa a FormDetallesPrenda para mostrar el historial de entradas de cada prenda
 	private logica.EntradaLogica entradas;
-
-	// Modelo de la tabla — permite agregar y quitar filas dinámicamente, fuera del constr
 	private DefaultTableModel modeloTabla;
 	private JButton btnBuscar;
 	private JButton btnNuevaPrenda;
 	private JScrollPane scrollPane;
 
-
-
 	/**
-	 * Create the panel.
+	 * Constructor: Crea el panel visual
 	 */
-	public PanelGestion(InventarioLogica gestor,  logica.EntradaLogica entradas) {
-		this.gestor=gestor;
-		this.entradas=entradas;
+	public PanelGestion(InventarioLogica gestor, logica.EntradaLogica entradas) {
+		this.gestor = gestor;
+		this.entradas = entradas;
 		
 		setBackground(new Color(245, 242, 225));
 		setLayout(null);
@@ -58,6 +49,7 @@ public class PanelGestion extends JPanel implements ActionListener {
 		txtBuscar.setForeground(new Color(150, 150, 150));
 		txtBuscar.setText("Ingresa código o nombre de la prenda..");
 		add(txtBuscar);
+		configurarPlaceholderBuscador();
 		txtBuscar.setColumns(10);
 		
 		btnBuscar = new JButton("BUSCAR");
@@ -74,12 +66,11 @@ public class PanelGestion extends JPanel implements ActionListener {
 		lblNewLabel.setFont(new Font("Arial", Font.PLAIN, 12));
 		add(lblNewLabel);
 		
-		JComboBox<String> cboCategoria = new JComboBox<>();
-		cboCategoria.setModel(new DefaultComboBoxModel(new String[] {"TODAS", "PANTALONES & JEANS", "POLOS", "FALDAS & SHORTS", "VESTIDOS", "ACCESORIOS", "POLERAS", "CASACAS"}));
+		cboCategoria = new JComboBox<>();
+		cboCategoria.setModel(new DefaultComboBoxModel<>(new String[] {"TODAS", "PANTALONES & JEANS", "POLOS", "FALDAS & SHORTS", "VESTIDOS", "POLERAS", "CASACAS"}));
 		cboCategoria.setBounds(440, 15, 125, 32);
 		add(cboCategoria);
-		
-		
+		cboCategoria.addActionListener(e -> filtrarPorCategoria());
 		
 		btnNuevaPrenda = new JButton("+ NUEVA PRENDA");
 		btnNuevaPrenda.addActionListener(this);
@@ -93,155 +84,129 @@ public class PanelGestion extends JPanel implements ActionListener {
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 89, 811, 459);
 		add(scrollPane);
-		{
-			// DefaultTableModel es el modelo que controla los datos de la tabla
-			// Le decimos qué columnas tiene y que empiece sin filas
-			modeloTabla = new DefaultTableModel(
-			    new Object[][]{},  // sin filas al inicio
-			    new String[]{"ID", "IMAGEN", "NOMBRE", "STOCK", "PRECIO", "CATEGORÍA", "ACCIONES", "DETALLES"}
-			) {
-			    // Sobreescribimos isCellEditable para que el usuario
-			    // no pueda editar las celdas directamente haciendo doble clic
-			    public boolean isCellEditable(int row, int col) { return false; }
-			};
+		
+		modeloTabla = new DefaultTableModel(
+			new Object[][]{}, 
+			new String[]{"ID", "IMAGEN", "NOMBRE", "STOCK", "PRECIO", "CATEGORÍA", "ACCIONES", "DETALLES"}
+		) {
+			private static final long serialVersionUID = 1L;
+			public boolean isCellEditable(int row, int col) { return false; }
+		};
 
-			// Le pasamos el modelo a la tabla para que muestre sus datos
-			tabladeGestión = new JTable(modeloTabla);
+		tabladeGestión = new JTable(modeloTabla);
+		tabladeGestión.setRowHeight(50);
+		
+		tabladeGestión.getColumnModel().getColumn(1).setCellRenderer(
+			new javax.swing.table.DefaultTableCellRenderer() {
+				private static final long serialVersionUID = 1L;
+				public java.awt.Component getTableCellRendererComponent(
+						JTable t, Object v, boolean sel, boolean foc, int r, int c) {
+					JLabel lbl = new JLabel();
+					lbl.setHorizontalAlignment(JLabel.CENTER);
+					if (v instanceof ImageIcon) lbl.setIcon((ImageIcon) v);
+					return lbl;
+				}
+			});
 
-			// Altura de cada fila — más alta para que se vea la imagen
-			tabladeGestión.setRowHeight(50);
-			
-			// Le dice a la tabla que la columna 1 (IMAGEN) muestra ImageIcon, no texto
-			tabladeGestión.getColumnModel().getColumn(1).setCellRenderer(
-			    new javax.swing.table.DefaultTableCellRenderer() {
-			        public java.awt.Component getTableCellRendererComponent(
-			                JTable t, Object v, boolean sel, boolean foc, int r, int c) {
-			            JLabel lbl = new JLabel();
-			            lbl.setHorizontalAlignment(JLabel.CENTER);
-			            if (v instanceof ImageIcon) lbl.setIcon((ImageIcon) v);
-			            return lbl;
-			        }
-			    });
+		scrollPane.setViewportView(tabladeGestión);
 
-			// Ponemos la tabla dentro del scrollPane para que tenga scroll
-			scrollPane.setViewportView(tabladeGestión);
-		}
-		// ── Renderer columna ACCIONES (índice 6) ──
-				// En lugar de texto, muestra dos botones: EDITAR y ELIMINAR
-				// El renderer se ejecuta cada vez que la tabla dibuja esa celda
-				tabladeGestión.getColumnModel().getColumn(6).setCellRenderer(
-				    (t, v, sel, foc, r, c) -> {
-				        // Panel que contiene los dos botones
-				        JPanel p = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 4, 10));
-				        p.setBackground(Color.WHITE);
-				        // Botón EDITAR — rosado
-				        JButton bEditar = new JButton("EDITAR");
-				        bEditar.setBackground(new Color(220, 190, 195));
-				        bEditar.setForeground(new Color(50, 50, 50));
-				        bEditar.setBorderPainted(false);
-				        bEditar.setFont(new Font("Arial", Font.BOLD, 10));
-				        // Botón ELIMINAR — gris
-				        JButton bEliminar = new JButton("ELIMINAR");
-				        bEliminar.setBackground(new Color(180, 180, 185));
-				        bEliminar.setForeground(new Color(50, 50, 50));
-				        bEliminar.setBorderPainted(false);
-				        bEliminar.setFont(new Font("Arial", Font.BOLD, 10));
-				        p.add(bEditar);
-				        p.add(bEliminar);
-				        return p;
-				    });
-
-				// ── Renderer columna DETALLES (índice 7) ──
-				// Muestra un botón azul "VER DETALLES" en cada fila
-				tabladeGestión.getColumnModel().getColumn(7).setCellRenderer(
-				    (t, v, sel, foc, r, c) -> {
-				        JPanel p = new JPanel(new java.awt.BorderLayout());
-				        p.setBackground(Color.WHITE);
-				        p.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
-				        JButton bDetalle = new JButton("<html><center>VER<br>DETALLES</center></html>");
-				        bDetalle.setBackground(new Color(100, 160, 220));
-				        bDetalle.setForeground(Color.WHITE);
-				        bDetalle.setBorderPainted(false);
-				        bDetalle.setFont(new Font("Arial", Font.BOLD, 11));
-				        p.add(bDetalle, java.awt.BorderLayout.CENTER);
-				        return p;
-				    });
+		tabladeGestión.getColumnModel().getColumn(6).setCellRenderer(
+			(t, v, sel, foc, r, c) -> {
+				JPanel p = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 4, 10));
+				p.setBackground(Color.WHITE);
+				JButton bEditar = new JButton("EDITAR");
+				bEditar.setBackground(new Color(220, 190, 195));
+				bEditar.setForeground(new Color(50, 50, 50));
+				bEditar.setBorderPainted(false);
+				bEditar.setFont(new Font("Arial", Font.BOLD, 10));
 				
-				// Ajustar anchos de columnas para que todo se vea bien
-				tabladeGestión.getColumnModel().getColumn(0).setPreferredWidth(70);  // ID
-				tabladeGestión.getColumnModel().getColumn(1).setPreferredWidth(65);  // IMAGEN
-				tabladeGestión.getColumnModel().getColumn(2).setPreferredWidth(140); // NOMBRE
-				tabladeGestión.getColumnModel().getColumn(3).setPreferredWidth(55);  // STOCK
-				tabladeGestión.getColumnModel().getColumn(4).setPreferredWidth(75);  // PRECIO
-				tabladeGestión.getColumnModel().getColumn(5).setPreferredWidth(130); // CATEGORÍA
-				tabladeGestión.getColumnModel().getColumn(6).setPreferredWidth(200); // ACCIONES
-				tabladeGestión.getColumnModel().getColumn(7).setPreferredWidth(110); // DETALLES
-				
-				// MouseListener — detecta clics en la tabla
-				// Según la columna donde se hizo clic, ejecuta una acción diferente
-				tabladeGestión.addMouseListener(new java.awt.event.MouseAdapter() {
-				    public void mouseClicked(java.awt.event.MouseEvent e) {
-				        int fila = tabladeGestión.rowAtPoint(e.getPoint()); // fila donde se hizo clic
-				        int col  = tabladeGestión.columnAtPoint(e.getPoint()); // columna donde se hizo clic
-				        if (fila < 0) return; // si no hay fila, no hace nada
-				        
-				        if (col == 6) {
-				            // Columna ACCIONES — detecta si es EDITAR o ELIMINAR por posición X
-				            int x = e.getX() - tabladeGestión.getCellRect(fila, col, true).x;
-				            	if (x < 90) {
-				            	    // EDITAR — abre el formulario con los datos de la prenda
-				            	    modelo.Prenda p = gestor.getPrendas().get(fila);
-				            	    FormEditarPrenda dlg = new FormEditarPrenda(fila, p, modeloTabla, gestor);
-				            	    dlg.setLocationRelativeTo(null);
-				            	    dlg.setVisible(true);
-				            	}
+				JButton bEliminar = new JButton("ELIMINAR");
+				bEliminar.setBackground(new Color(180, 180, 185));
+				bEliminar.setForeground(new Color(50, 50, 50));
+				bEliminar.setBorderPainted(false);
+				bEliminar.setFont(new Font("Arial", Font.BOLD, 10));
+				p.add(bEditar);
+				p.add(bEliminar);
+				return p;
+			});
 
-				              
-				             else {
-				                // ELIMINAR
-				                int confirm = JOptionPane.showConfirmDialog(null,
-				                    "¿Eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
-				                if (confirm == JOptionPane.YES_OPTION) {
-				                    String codigo = gestor.getPrendas().get(fila).getCodigo();
-				                    boolean ok = dao.PrendaDAO.eliminar(codigo);
-				                    if (ok) {
-				                        gestor.gestionar(fila);
-				                        modeloTabla.removeRow(fila);
-				                        JOptionPane.showMessageDialog(null, "Prenda eliminada.");
-				                    } else {
-				                        JOptionPane.showMessageDialog(null, "No se pudo eliminar de la base de datos.");
-				                    }
-				                }
-				            }
-				        } else if (col == 7) {
-				        	// VER DETALLES — abre el dialog con los datos de la prenda
-				            modelo.Prenda p = gestor.getPrendas().get(fila);
-				           
-				            FormDetallesPrenda dlg = new FormDetallesPrenda(p,entradas);
-				            dlg.setLocationRelativeTo(null);
-				            dlg.setVisible(true);
-				           
-				        }
-				    }
-				});
-				// Carga las prendas de MySQL al iniciar
+		tabladeGestión.getColumnModel().getColumn(7).setCellRenderer(
+			(t, v, sel, foc, r, c) -> {
+				JPanel p = new JPanel(new java.awt.BorderLayout());
+				p.setBackground(Color.WHITE);
+				p.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
+				JButton bDetalle = new JButton("<html><center>VER<br>DETALLES</center></html>");
+				bDetalle.setBackground(new Color(100, 160, 220));
+				bDetalle.setForeground(Color.WHITE);
+				bDetalle.setBorderPainted(false);
+				bDetalle.setFont(new Font("Arial", Font.BOLD, 11));
+				p.add(bDetalle, java.awt.BorderLayout.CENTER);
+				return p;
+			});
+		
+		tabladeGestión.getColumnModel().getColumn(0).setPreferredWidth(70);  
+		tabladeGestión.getColumnModel().getColumn(1).setPreferredWidth(65);  
+		tabladeGestión.getColumnModel().getColumn(2).setPreferredWidth(140); 
+		tabladeGestión.getColumnModel().getColumn(3).setPreferredWidth(55);  
+		tabladeGestión.getColumnModel().getColumn(4).setPreferredWidth(75);  
+		tabladeGestión.getColumnModel().getColumn(5).setPreferredWidth(130); 
+		tabladeGestión.getColumnModel().getColumn(6).setPreferredWidth(200); 
+		tabladeGestión.getColumnModel().getColumn(7).setPreferredWidth(110); 
+		
+		tabladeGestión.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mouseClicked(java.awt.event.MouseEvent e) {
+				int fila = tabladeGestión.rowAtPoint(e.getPoint()); 
+				int col  = tabladeGestión.columnAtPoint(e.getPoint()); 
+				if (fila < 0) return; 
+				
+				if (col == 6) {
+					int x = e.getX() - tabladeGestión.getCellRect(fila, col, true).x;
+					if (x < 90) {
+						modelo.Prenda p = gestor.getPrendas().get(fila);
+						FormEditarPrenda dlg = new FormEditarPrenda(fila, p, modeloTabla, gestor);
+						dlg.setLocationRelativeTo(null);
+						dlg.setVisible(true);
+					} else {
+						int confirm = JOptionPane.showConfirmDialog(null,
+							"¿Eliminar esta prenda?", "Confirmar", JOptionPane.YES_NO_OPTION);
+						if (confirm == JOptionPane.YES_OPTION) {
+							String codigo = gestor.getPrendas().get(fila).getCodigo();
+							boolean ok = dao.PrendaDAO.eliminar(codigo);
+							if (ok) {
+								gestor.gestionar(fila);
+								modeloTabla.removeRow(fila);
+								JOptionPane.showMessageDialog(null, "Prenda eliminada.");
+							} else {
+								JOptionPane.showMessageDialog(null, "No se pudo eliminar de la base de datos.");
+							}
+						}
+					}
+				} else if (col == 7) {
+					modelo.Prenda p = gestor.getPrendas().get(fila);
+					
+					// ==============================================================
+					// ──> CAMBIO 1: SE AGREGO ESTE BLOQUE AQUÍ EN DETALLES
+					// Carga las variantes directo de MySQL antes de abrir la ventana flotante
+					// ==============================================================
+					java.util.List<modelo.Variante> frescas = dao.PrendaDAO.ListarVariantes(p.getCodigo());
+					p.setVariantes(frescas);
+					
+					FormDetallesPrenda dlg = new FormDetallesPrenda(p, entradas);
+					dlg.setLocationRelativeTo(null);
+					dlg.setVisible(true);
+				}
+			}
+		});
+
+		cargarPrendasDesdeDB();
+		
+		addComponentListener(new java.awt.event.ComponentAdapter() {
+			public void componentShown(java.awt.event.ComponentEvent e) {
 				cargarPrendasDesdeDB();
-				
-				// Escucha cuando el panel se hace visible en pantalla
-				// Se dispara cuando el usuario hace clic en "PANEL DE GESTIÓN" en el sidebar
-				addComponentListener(new java.awt.event.ComponentAdapter() {
-				    
-				    // Este método se ejecuta cada vez que el panel aparece en pantalla
-				    public void componentShown(java.awt.event.ComponentEvent e) {
-				    	cargarPrendasDesdeDB();
-				    }
-				});
-
+			}
+		});
 	}
 	
-
-	
-
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnNuevaPrenda) {
 			do_btnNuevaPrenda_actionPerformed(e);
@@ -250,40 +215,118 @@ public class PanelGestion extends JPanel implements ActionListener {
 			do_btnBuscar_actionPerformed(e);
 		}
 	}
-	private void cargarPrendasDesdeDB() {
-	    modeloTabla.setRowCount(0);
-	    gestor.limpiar();
-	    for (modelo.Prenda p : dao.PrendaDAO.listar()) {
-	    	gestor.agregarPrenda(p);
-	        javax.swing.ImageIcon icon = null;
-	        if (p.getImagen() != null && !p.getImagen().isEmpty()) {
-	            icon = new javax.swing.ImageIcon(
-	                new javax.swing.ImageIcon(p.getImagen())
-	                    .getImage()
-	                    .getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH));
-	        }
-	        modeloTabla.addRow(new Object[]{
-	            p.getCodigo(),
-	            icon,
-	            p.getNombre(),
-	            p.stockPorVariante(),
-	            "S/. " + p.getPrecio(),
-	            p.getCategoria()
-	        });
-	    }
+
+	// =========================================================================
+	// METODOS LÓGICOS DE CARGA Y FILTRADO (AQUÍ SE MOVIÓ EL MÉTODO FILTRAR)
+	// =========================================================================
+
+	private void filtrarPorCategoria() {
+		String categoria = cboCategoria.getSelectedItem().toString();
+		modeloTabla.setRowCount(0);
+
+		java.util.List<Prenda> listaFiltrada = gestor.gestionar("", categoria);
+
+		for (Prenda p : listaFiltrada) {
+			ImageIcon icon = null;
+			if (p.getImagen() != null && !p.getImagen().isEmpty()) {
+				icon = new ImageIcon(
+						new ImageIcon(p.getImagen())
+								.getImage()
+								.getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH));
+			}
+
+			modeloTabla.addRow(new Object[]{
+					p.getCodigo(),
+					icon,
+					p.getNombre(),
+					p.getStockTotal(), // ──> CAMBIO 2: Cambiado de p.stockPorVariante() a p.getStockTotal()
+					"S/. " + p.getPrecio(),
+					p.getCategoria(),
+					"",
+					""
+			});
+		}
 	}
-	//botón buscar
+
+	private void cargarPrendasDesdeDB() {
+		modeloTabla.setRowCount(0);
+		gestor.limpiar();
+		for (modelo.Prenda p : dao.PrendaDAO.listar()) {
+			gestor.agregarPrenda(p);
+			javax.swing.ImageIcon icon = null;
+			if (p.getImagen() != null && !p.getImagen().isEmpty()) {
+				icon = new javax.swing.ImageIcon(
+					new javax.swing.ImageIcon(p.getImagen())
+						.getImage()
+						.getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH));
+			}
+			modeloTabla.addRow(new Object[]{
+				p.getCodigo(),
+				icon,
+				p.getNombre(),
+				p.getStockTotal(), // ──> CAMBIO 3: Cambiado de p.stockPorVariante() a p.getStockTotal()
+				"S/. " + p.getPrecio(),
+				p.getCategoria()
+			});
+		}
+	}
+
 	protected void do_btnBuscar_actionPerformed(ActionEvent e) {
+		String textoBuscado = txtBuscar.getText().trim();
+		if (textoBuscado.equals("Ingresa código o nombre de la prenda..")) {
+			textoBuscado = "";
+		}
+		
+		modeloTabla.setRowCount(0);
+		String catActiva = cboCategoria.getSelectedItem().toString();
+		java.util.List<Prenda> listaFiltrada = gestor.gestionar(textoBuscado, catActiva);
+		
+		for (Prenda p : listaFiltrada) {
+			ImageIcon icon = null;
+			if (p.getImagen() != null && !p.getImagen().isEmpty()) {
+				icon = new ImageIcon(
+					new ImageIcon(p.getImagen())
+						.getImage()
+						.getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH)
+				);
+			}
+
+			modeloTabla.addRow(new Object[]{
+				p.getCodigo(),
+				icon,
+				p.getNombre(),
+				p.getStockTotal(), // ──> CAMBIO 4: Cambiado de p.stockPorVariante() a p.getStockTotal()
+				"S/. " + p.getPrecio(),
+				p.getCategoria(),
+				"",
+				""
+			});
+		}
 	}
 	
-	//botón nueva prenda
 	protected void do_btnNuevaPrenda_actionPerformed(ActionEvent e) {
+		FormNuevaPrenda dialog = new FormNuevaPrenda(modeloTabla, gestor);
+		dialog.setVisible(true);
+	}
 
-		  // Abrir el formulario de registro de nueva prenda
-      FormNuevaPrenda dialog =
-          new FormNuevaPrenda(modeloTabla, gestor);
+	public void configurarPlaceholderBuscador() {
+		txtBuscar.addFocusListener(new java.awt.event.FocusAdapter() {
+			@Override
+			public void focusGained(java.awt.event.FocusEvent e) {
+				if (txtBuscar.getText().equals("Ingresa código o nombre de la prenda..")) {
+					txtBuscar.setText("");
+					txtBuscar.setForeground(Color.BLACK);
+				}
+			}
 
-      // Mostrar la ventana
-      dialog.setVisible(true);
+			@Override
+			public void focusLost(java.awt.event.FocusEvent e) {
+				if (txtBuscar.getText().trim().isEmpty()) {
+					txtBuscar.setText("Ingresa código o nombre de la prenda..");
+					txtBuscar.setForeground(new Color(150, 150, 150));
+				}
+			}
+		});
+	
 	}
 }

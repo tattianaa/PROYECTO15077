@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import modelo.Prenda;
 import modelo.Variante;
 import BD.Conexion;
+
 public class PrendaDAO {
 
     // Guarda una prenda nueva en MySQL
@@ -20,14 +21,10 @@ public class PrendaDAO {
             cs.setString(5, p.getImagen());
             cs.execute();
 
-            // Guarda cada talla de la prenda
-            for (Variante v : p.getVariantes()) {
-                CallableStatement csV = Conexion.getConexion().prepareCall("{call ActualizarStock(?,?,?)}");
-                csV.setString(1, p.getCodigo());
-                csV.setString(2, v.getTalla());
-                csV.setInt(3, v.getStock());
-                csV.execute();
-            }
+            // ── ¡MODIFICADO AQUÍ! ──
+            // Se eliminó el bucle for de variantes en la inserción inicial de la prenda
+            // para evitar el choque con la lógica automática de Entradas en MySQL.
+
             return true;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al insertar: " + e.getMessage());
@@ -35,7 +32,7 @@ public class PrendaDAO {
         }
     }
 
-    // Trae todas las prendas con sus tallas desde MySQL
+    // Trae todas las prendas con su stock acumulado directamente desde MySQL
     public static List<Prenda> listar() {
         List<Prenda> lista = new ArrayList<>();
         try {
@@ -43,22 +40,15 @@ public class PrendaDAO {
             ResultSet rs = cs.executeQuery();
             while (rs.next()) {
                 Prenda p = new Prenda(
-                    rs.getString("codigo"),
-                    rs.getString("nombre"),
-                    rs.getDouble("precio"),
-                    rs.getString("categoria"),
-                    0,
-                    rs.getString("imagen"),
-                    0,
-                    new ArrayList<>()
+                    rs.getString("codigo"),      // 1. codigo
+                    rs.getString("nombre"),      // 2. nombre
+                    rs.getDouble("precio"),      // 3. precio
+                    rs.getString("categoria"),   // 4. categoria
+                    0,                           // 5. id
+                    rs.getString("imagen"),      // 6. imagen
+                    rs.getInt("stock_total"),    // 7. stockTotal (Lee el SUM de tu base de datos)
+                    new ArrayList<>()            // 8. variantes vacías
                 );
-                // Trae las tallas de esa prenda
-                CallableStatement csV = Conexion.getConexion().prepareCall("{call ListarVariantes(?)}");
-                csV.setString(1, p.getCodigo());
-                ResultSet rsV = csV.executeQuery();
-                while (rsV.next()) {
-                    p.agregarVariante(rsV.getString("talla"), rsV.getInt("stock"));
-                }
                 lista.add(p);
             }
         } catch (Exception e) {
@@ -110,5 +100,25 @@ public class PrendaDAO {
             JOptionPane.showMessageDialog(null, "Error al actualizar stock: " + e.getMessage());
             return false;
         }
+    }
+ // ── AGREGADO: Trae el desglose de tallas y stocks de una prenda específica desde MySQL
+    public static List<Variante> ListarVariantes(String codigoPrenda) {
+        List<Variante> lista = new ArrayList<>();
+        try {
+            CallableStatement cs = Conexion.getConexion().prepareCall("{call ListarVariantes(?)}");
+            cs.setString(1, codigoPrenda);
+            ResultSet rs = cs.executeQuery();
+            while (rs.next()) {
+                // Se leen las columnas de la tabla variantes de la BD
+                Variante v = new Variante(
+                    rs.getString("talla"),
+                    rs.getInt("stock")
+                );
+                lista.add(v);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al listar variantes en DAO: " + e.getMessage());
+        }
+        return lista;
     }
 }

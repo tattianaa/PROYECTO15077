@@ -121,7 +121,7 @@ public class FormDetallesPrenda extends JDialog implements ActionListener {
 			separator_1 = new JSeparator();
 			separator_1.setBounds(10, 253, 410, 7);
 			contentPanel.add(separator_1);
-		}
+		}	
 		{
 			separator = new JSeparator();
 			separator.setBounds(10, 210, 410, 7);
@@ -273,7 +273,10 @@ public class FormDetallesPrenda extends JDialog implements ActionListener {
 
 	    // Limpiamos filas anteriores
 	    mEntradas.setRowCount(0);
+	    
+	    
 
+	  //leedesde  BD. Como ahora las entradas se guardan en MySQL
 	    for (modelo.EntradaInventario e : dao.EntradasDAO.listar()) {
 	        if (e.getCodigoPrenda().equals(prenda.getCodigo())) {
 	            mEntradas.addRow(new Object[]{

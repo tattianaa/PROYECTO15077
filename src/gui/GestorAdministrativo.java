@@ -40,11 +40,11 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JButton btnPanelGestion;
-	private JButton btnGestionPedidos;
 	private JButton btnGestionProveedores;
 	private JButton btnGestionInventarios;
 	private JButton btnPuntoVenta;
 	private JButton btnCerrarSesion_1;
+	private GestorVentas panelVentas;
 
 	/**
 	 * Launch the application.
@@ -92,15 +92,6 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		separator.setBounds(10, 48, 228, 14);
 		panel.add(separator);
 		
-		JButton btnConfiguracion = new JButton("⚙️ CONFIGURACIÓN");
-		btnConfiguracion.setHorizontalAlignment(SwingConstants.LEFT);
-		btnConfiguracion.setForeground(new Color(60, 60, 60));
-		btnConfiguracion.setFocusPainted(false);
-		btnConfiguracion.setBorderPainted(false);
-		btnConfiguracion.setBackground(Color.WHITE);
-		btnConfiguracion.setBounds(5, 240, 228, 30);
-		panel.add(btnConfiguracion);
-		
 		btnPanelGestion = new JButton("📋 PANEL DE GESTIÓN");
 		btnPanelGestion.addActionListener(this);
 		btnPanelGestion.setHorizontalAlignment(SwingConstants.LEFT);
@@ -111,16 +102,6 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		btnPanelGestion.setBounds(5, 65, 228, 30);
 		panel.add(btnPanelGestion);
 		
-		btnGestionPedidos = new JButton("📦 GESTIÓN DE PEDIDOS");
-		btnGestionPedidos.addActionListener(this);
-		btnGestionPedidos.setHorizontalAlignment(SwingConstants.LEFT);
-		btnGestionPedidos.setForeground(new Color(60, 60, 60));
-		btnGestionPedidos.setFocusPainted(false);
-		btnGestionPedidos.setBorderPainted(false);
-		btnGestionPedidos.setBackground(Color.WHITE);
-		btnGestionPedidos.setBounds(5, 100, 228, 30);
-		panel.add(btnGestionPedidos);
-		
 		btnGestionProveedores = new JButton("🏭 GESTIÓN DE PROVEEDORES");
 		btnGestionProveedores.addActionListener(this);
 		btnGestionProveedores.setHorizontalAlignment(SwingConstants.LEFT);
@@ -128,7 +109,7 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		btnGestionProveedores.setFocusPainted(false);
 		btnGestionProveedores.setBorderPainted(false);
 		btnGestionProveedores.setBackground(Color.WHITE);
-		btnGestionProveedores.setBounds(5, 135, 228, 30);
+		btnGestionProveedores.setBounds(10, 100, 228, 30);
 		panel.add(btnGestionProveedores);
 		
 		btnGestionInventarios = new JButton("📥 GESTIÓN DE INVENTARIOS");
@@ -138,7 +119,7 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		btnGestionInventarios.setFocusPainted(false);
 		btnGestionInventarios.setBorderPainted(false);
 		btnGestionInventarios.setBackground(Color.WHITE);
-		btnGestionInventarios.setBounds(5, 170, 228, 30);
+		btnGestionInventarios.setBounds(10, 140, 228, 30);
 		panel.add(btnGestionInventarios);
 		
 		btnPuntoVenta = new JButton("🛒 PUNTO DE VENTA");
@@ -148,7 +129,7 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		btnPuntoVenta.setFocusPainted(false);
 		btnPuntoVenta.setBorderPainted(false);
 		btnPuntoVenta.setBackground(Color.WHITE);
-		btnPuntoVenta.setBounds(5, 205, 228, 30);
+		btnPuntoVenta.setBounds(10, 180, 228, 30);
 		panel.add(btnPuntoVenta);
 		
 		btnCerrarSesion_1 = new JButton("🚪 CERRAR SESIÓN");
@@ -158,7 +139,7 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		btnCerrarSesion_1.setFocusPainted(false);
 		btnCerrarSesion_1.setBorderPainted(false);
 		btnCerrarSesion_1.setBackground(Color.WHITE);
-		btnCerrarSesion_1.setBounds(5, 275, 228, 30);
+		btnCerrarSesion_1.setBounds(10, 222, 228, 30);
 		panel.add(btnCerrarSesion_1);
 		
 		mainPanel = new JPanel();
@@ -181,11 +162,14 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		panelGestion.setLayout(null);
 		mainPanel.add(new GestorProveedores(GestorProveedores), "proveedores");
 		mainPanel.add(new GestorEntradas(gestor, GestorProveedores,  gestorEntradas), "entradas");
-		mainPanel.add(new GestorVentas(), "ventas");
+		
+		// 1. Creamos la variable única para tu Punto de Venta
+	 panelVentas = new GestorVentas(gestor);
+		// 2. La agregamos al contenedor principal con su etiqueta
+		mainPanel.add(panelVentas, "ventas");
 		
 		// Muestra el panel de gestión al iniciar la aplicación
 		cl.show(mainPanel, "gestión");
-
 
 
 	}
@@ -202,9 +186,6 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 		if (e.getSource() == btnGestionProveedores) {
 			do_btnGestionProveedores_1_actionPerformed(e);
 		}
-		if (e.getSource() == btnGestionPedidos) {
-			do_btnGestionPedidos_actionPerformed(e);
-		}
 		if (e.getSource() == btnPanelGestion) {
 			do_btnPanelGestion_1_actionPerformed(e);
 		}
@@ -213,10 +194,6 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 	//botón PanelGestión
 	protected void do_btnPanelGestion_1_actionPerformed(ActionEvent e) {
 		cl.show(mainPanel, "gestión");
-	}
-	//botoón gestión pedidos
-	protected void do_btnGestionPedidos_actionPerformed(ActionEvent e) {
-		cl.show(mainPanel, "pedidos");
 	}
 	
 	//botón proveedores
@@ -229,10 +206,14 @@ public class GestorAdministrativo extends JFrame implements ActionListener {
 	}
 	//botón punto deventa
 	protected void do_btnPuntoVenta_actionPerformed(ActionEvent e) {
+		panelVentas.refrescarCatalogoFiltrado("", "TODAS");
 		cl.show(mainPanel, "ventas");
 	}
 	protected void do_btnCerrarSesion_1_actionPerformed(ActionEvent e) {
-		 new Login().setVisible(true);
-		    dispose();
+		
+		new FrmLogin().setVisible(true);
+		this.setVisible(false);
+		
+
 	}
 }

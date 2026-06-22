@@ -9,24 +9,17 @@ import javax.swing.table.DefaultTableModel;
 import logica.InventarioLogica;
 import logica.ProveedorLogica;
 
-// Panel de registro de entradas de mercadería
-// Recibe las instancias de lógica desde GestorAdministrativo para leer proveedores y prendas
 public class GestorEntradas extends JPanel {
 
-
+    private static final long serialVersionUID = 1L;
     private ProveedorLogica proveedores;
- // Lógica de entradas — recibida desde GestorAdministrativo para guardar el historial
     private logica.EntradaLogica entradas;
-    
     private DefaultTableModel modeloEntradas;
-
-
 
     public GestorEntradas(InventarioLogica inventario, ProveedorLogica proveedores, logica.EntradaLogica entradas) {
        
         this.proveedores = proveedores;
-        this.entradas=entradas;
-        
+        this.entradas = entradas;
         
         setLayout(null);
         setBackground(new Color(245, 242, 225));
@@ -44,7 +37,7 @@ public class GestorEntradas extends JPanel {
         formPanel.setBounds(20, 55, 758, 180);
         add(formPanel);
 
-        // Combo: proveedor — muestra los proveedores registrados en formato "CODIGO - Nombre"
+        // Combo: proveedor
         JLabel lProv = new JLabel("Proveedor:");
         lProv.setFont(new Font("Arial", Font.PLAIN, 12));
         lProv.setBounds(15, 15, 150, 20);
@@ -54,7 +47,7 @@ public class GestorEntradas extends JPanel {
         comboProveedor.setBounds(15, 35, 160, 30);
         formPanel.add(comboProveedor);
 
-        // Combo: prenda — muestra las prendas registradas en formato "CODIGO - Nombre"
+        // Combo: prenda
         JLabel lPrenda = new JLabel("Prenda:");
         lPrenda.setFont(new Font("Arial", Font.PLAIN, 12));
         lPrenda.setBounds(190, 15, 130, 20);
@@ -64,7 +57,7 @@ public class GestorEntradas extends JPanel {
         comboPrenda.setBounds(190, 35, 160, 30);
         formPanel.add(comboPrenda);
 
-        // ComboBox: talla de la prenda
+        // ComboBox: talla
         JLabel lTalla = new JLabel("Talla:");
         lTalla.setFont(new Font("Arial", Font.PLAIN, 12));
         lTalla.setBounds(365, 15, 60, 20);
@@ -74,7 +67,7 @@ public class GestorEntradas extends JPanel {
         comboTalla.setBounds(365, 35, 80, 30);
         formPanel.add(comboTalla);
 
-        // Campo: cantidad de unidades que ingresaron
+        // Campo: cantidad
         JLabel lCantidad = new JLabel("Cantidad:");
         lCantidad.setFont(new Font("Arial", Font.PLAIN, 12));
         lCantidad.setBounds(565, 15, 80, 20);
@@ -83,7 +76,7 @@ public class GestorEntradas extends JPanel {
         txtCantidad.setBounds(565, 35, 70, 30);
         formPanel.add(txtCantidad);
 
-        // Fecha: se autogenera con la fecha de hoy — no editable
+        // Fecha
         JLabel lFecha = new JLabel("Fecha:");
         lFecha.setFont(new Font("Arial", Font.PLAIN, 12));
         lFecha.setBounds(650, 15, 60, 20);
@@ -95,7 +88,7 @@ public class GestorEntradas extends JPanel {
         txtFecha.setBounds(650, 35, 95, 30);
         formPanel.add(txtFecha);
 
-        // Botón para registrar la entrada
+        // Botón registrar
         JButton btnRegistrar = new JButton("REGISTRAR ENTRADA");
         btnRegistrar.setFont(new Font("Arial", Font.BOLD, 12));
         btnRegistrar.setBackground(new Color(130, 190, 140));
@@ -107,7 +100,7 @@ public class GestorEntradas extends JPanel {
         btnRegistrar.setBounds(15, 110, 200, 36);
         formPanel.add(btnRegistrar);
 
-        // Botón para limpiar los campos editables del formulario
+        // Botón limpiar
         JButton btnLimpiar = new JButton("LIMPIAR");
         btnLimpiar.setFont(new Font("Arial", Font.BOLD, 12));
         btnLimpiar.setBackground(new Color(180, 180, 185));
@@ -119,15 +112,15 @@ public class GestorEntradas extends JPanel {
         btnLimpiar.setBounds(230, 110, 120, 36);
         formPanel.add(btnLimpiar);
 
-        // Título del historial
+        // Historial
         JLabel lblHistorial = new JLabel("Historial de Entradas");
         lblHistorial.setFont(new Font("Arial", Font.BOLD, 13));
         lblHistorial.setBounds(20, 248, 250, 22);
         add(lblHistorial);
 
-        // Tabla que muestra todas las entradas registradas
         String[] columnas = {"Proveedor", "Prenda", "Talla", "Cantidad", "Fecha"};
         modeloEntradas = new DefaultTableModel(columnas, 0) {
+            private static final long serialVersionUID = 1L;
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
@@ -145,25 +138,19 @@ public class GestorEntradas extends JPanel {
         scrollEntradas.setBorder(new LineBorder(new Color(220, 220, 220)));
         add(scrollEntradas);
 
-        // Recargar combos cada vez que el panel se hace visible
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent e) {
-                // Recargar proveedores registrados
                 comboProveedor.removeAllItems();
                 comboProveedor.addItem("-- Seleccionar --");
                 for (String s : proveedores.getProveedoresFormato()) comboProveedor.addItem(s);
-                // Recargar prendas registradas
+                
                 comboPrenda.removeAllItems();
                 comboPrenda.addItem("-- Seleccionar --");
                 for (String s : inventario.getPrendasFormato()) comboPrenda.addItem(s);
                 cargarEntradasDesdeDB();
             }
-            
-
         });
-        
 
-        // Limpiar campos editables — los combos vuelven a "-- Seleccionar --"
         btnLimpiar.addActionListener(e -> {
             comboProveedor.setSelectedIndex(0);
             comboPrenda.setSelectedIndex(0);
@@ -171,7 +158,6 @@ public class GestorEntradas extends JPanel {
             txtCantidad.setText("");
         });
 
-        // Validar y registrar la entrada al presionar el botón
         btnRegistrar.addActionListener(e -> {
             String proveedorSeleccionado = (String) comboProveedor.getSelectedItem();
             if (proveedorSeleccionado.equals("-- Seleccionar --")) {
@@ -206,21 +192,23 @@ public class GestorEntradas extends JPanel {
             }
 
             modelo.EntradaInventario entrada = new modelo.EntradaInventario(codigoProveedor, codigoPrenda, talla, cant, fecha);
+            
+            // ── Llama de forma segura al Store Procedure de MySQL
             boolean ok = dao.EntradasDAO.insertar(entrada);
             if (!ok) return;
-            dao.PrendaDAO.actualizarStock(codigoPrenda, talla, cant);
+            
+            // ==============================================================
+            // CORRECCIÓN HISTÓRICA: Se eliminó la línea duplicada que sumaba stock manual
+            // ==============================================================
+            
             entradas.registrarEntrada(codigoProveedor, codigoPrenda, talla, cant, fecha);
 
-          
-
-
-            // Agrega la fila a la tabla visual
             modeloEntradas.addRow(new Object[]{codigoProveedor, codigoPrenda, talla, cant, fecha});
-
             JOptionPane.showMessageDialog(this, "Entrada registrada correctamente.");
             btnLimpiar.doClick();
         });
     }
+
     private void cargarEntradasDesdeDB() {
         modeloEntradas.setRowCount(0);
         for (modelo.EntradaInventario e : dao.EntradasDAO.listar()) {
@@ -233,5 +221,4 @@ public class GestorEntradas extends JPanel {
             });
         }
     }
-
 }
